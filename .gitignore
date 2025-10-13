@@ -1,0 +1,9 @@
+.env
+node_modules/
+*.log
+dist/
+*.rest
+.vercel
+
+.vscode/*
+!.vscode/extensions.json
