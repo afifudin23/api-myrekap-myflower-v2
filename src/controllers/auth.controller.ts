@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { authService } from "../services";
-import { authSchema } from "../schemas";
+import { authService } from "@/services";
+import { authSchema } from "@/schemas";
 
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     const appName = req.headers["x-app-name"];
@@ -13,7 +13,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             sameSite: "strict", // Tidak terkirim di request pihak ketiga
             maxAge: 60 * 60 * 24 * 1000,
             path: "/", // Hanya untuk path ini
-        }); 
+        });
         res.status(200).json(data);
     } catch (error) {
         return next(error);
@@ -81,9 +81,10 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-export const logoutUser = async (_req: Request, res: Response, next: NextFunction) => {
+export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
+    const appName = req.headers["x-app-name"];
     try {
-        res.clearCookie("token", {
+        res.clearCookie(`token_${appName}`, {
             httpOnly: true,
             secure: true, // Pastikan secure diaktifkan jika menggunakan HTTPS
             sameSite: "strict",

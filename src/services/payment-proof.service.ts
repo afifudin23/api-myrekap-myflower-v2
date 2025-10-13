@@ -1,7 +1,6 @@
-import prisma from "../config/database";
-import ErrorCode from "../constants/error-code";
-import { NotFoundException } from "../exceptions";
-import { cloudinary } from "../config";
+import ErrorCode from "@/constants/error-code";
+import { NotFoundException } from "@/exceptions";
+import { cloudinary, prisma } from "@/config";
 
 export const deletePaymentProofByOrderSummaryId = async (orderId: string) => {
     try {

@@ -1,5 +1,5 @@
 import { HttpException } from ".";
-import ErrorCode from "../constants/error-code";
+import ErrorCode from "@/constants/error-code";
 
 class BadRequestException extends HttpException {
     constructor(message: string, errorCode: ErrorCode) {

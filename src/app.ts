@@ -1,12 +1,12 @@
 import cors from "cors";
-import rootRouter from "./routes";
-import { attachLogger, errorMiddleware, httpLogger } from "./middlewares";
+import rootRouter from "@/routes";
+import { attachLogger, errorMiddleware, httpLogger } from "@/middlewares";
 import helmet from "helmet";
-import { InternalException } from "./exceptions";
-import ErrorCode from "./constants/error-code";
+import { InternalException } from "@/exceptions";
+import ErrorCode from "@/constants/error-code";
 import cookieParser from "cookie-parser";
 import path from "path";
-import { env } from "./config";
+import { env } from "@/config";
 import express from "express";
 const app = express();
 

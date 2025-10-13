@@ -1,4 +1,4 @@
-import { formatters } from "../../utils";
+import { formatters } from "@/utils";
 import { z } from "zod";
 
 const itemSchema = z.object({

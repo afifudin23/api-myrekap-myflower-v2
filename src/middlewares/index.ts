@@ -1,4 +1,4 @@
-export { default as authMiddleware } from "./auth.middleware";
+export { default as authMiddleware, AuthReq } from "./auth.middleware";
 export { default as errorMiddleware } from "./error.middleware";
 export { default as singleSuperadminMiddleware } from "./single-superadmin.middleware";
 export { default as superadminMiddleware } from "./superadmin.middleware";

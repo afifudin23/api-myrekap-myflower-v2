@@ -1,5 +1,5 @@
 import { HttpException } from ".";
-import ErrorCode from "../constants/error-code";
+import ErrorCode from "@/constants/error-code";
 
 class UnprocessableUntityException extends HttpException {
     constructor(message: string, errorCode: ErrorCode, errors: any) {

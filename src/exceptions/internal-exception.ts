@@ -1,5 +1,5 @@
 import { HttpException } from ".";
-import ErrorCode from "../constants/error-code";
+import ErrorCode from "@/constants/error-code";
 
 // For Internal Error Ex: Server Down
 class InternalException extends HttpException {

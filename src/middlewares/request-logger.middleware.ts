@@ -1,4 +1,4 @@
-import logger from "../utils/logger.util";
+import { logger } from "@/utils";
 import { NextFunction, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 

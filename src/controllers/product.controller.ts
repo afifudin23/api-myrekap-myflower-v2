@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { UnprocessableUntityException } from "../exceptions";
-import ErrorCode from "../constants/error-code";
-import { productService } from "../services";
-import { productSchema } from "../schemas";
+import ErrorCode from "@/constants/error-code";
+import { productService } from "@/services";
+import { productSchema } from "@/schemas";
 
 export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
     const files = req.files as Express.Multer.File[];

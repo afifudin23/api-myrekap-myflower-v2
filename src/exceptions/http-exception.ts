@@ -1,4 +1,4 @@
-import ErrorCode from "../constants/error-code";
+import ErrorCode from "@/constants/error-code";
 
 class HttpException extends Error {
     message: string;

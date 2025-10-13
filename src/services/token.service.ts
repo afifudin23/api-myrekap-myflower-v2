@@ -1,4 +1,4 @@
-import { prisma } from "../config";
+import { prisma } from "@/config";
 import { addMinutes } from "date-fns";
 import crypto from "crypto";
 

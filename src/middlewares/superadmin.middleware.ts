@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import ForbiddenException from "../exceptions/forbidden";
 import { AuthReq } from "./auth.middleware";
-import prisma from "../config/database";
-import ErrorCode from "../constants/error-code";
+import ErrorCode from "@/constants/error-code";
+import { ForbiddenException } from "@/exceptions";
+import { prisma } from "@/config";
 
 const superadminMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
     const userRoleSuperadmin = await prisma.user.findMany({

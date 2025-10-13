@@ -1,7 +1,7 @@
-import prisma from "../config/database";
-import ErrorCode from "../constants/error-code";
-import { BadRequestException, NotFoundException } from "../exceptions";
-import { cartItemSchema } from "../schemas";
+import { prisma } from "@/config";
+import ErrorCode from "@/constants/error-code";
+import { BadRequestException, NotFoundException } from "@/exceptions";
+import { cartItemSchema } from "@/schemas";
 
 export const findAll = async (userId: string) => {
     return await prisma.cartItem.findMany({

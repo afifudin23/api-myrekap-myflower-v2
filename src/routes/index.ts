@@ -1,14 +1,14 @@
+import authRouter from "@/routes/auth.route";
+import cartItemRouter from "@/routes/cart-item.route";
+import ordersAdminRouter from "@/routes/orders/admin.route";
+import ordersCustomerRouter from "@/routes/orders/customer.route";
+import paymentProofRouter from "@/routes/payment-proof.route";
+import productRouter from "@/routes/product.route";
+import reportRouter from "@/routes/report.route";
+import reviewRouter from "@/routes/review.route";
+import transactionRouter from "@/routes/transaction.route";
+import userRouter from "@/routes/user.route";
 import { Router } from "express";
-import authRouter from "./auth.route";
-import paymentProofRouter from "../routes/payment-proof.route";
-import productRouter from "../routes/product.route";
-import cartItemRouter from "../routes/cart-item.route";
-import transactionRouter from "../routes/transaction.route";
-import ordersCustomerRouter from "../routes/orders/customer.route";
-import ordersAdminRouter from "../routes/orders/admin.route";
-import userRouter from "../routes/user.route";
-import reviewRouter from "../routes/review.route";
-import reportRouter from "../routes/report.route";
 
 const rootRouter: Router = Router();
 

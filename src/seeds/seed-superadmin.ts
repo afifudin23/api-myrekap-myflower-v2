@@ -1,5 +1,4 @@
-import prisma from "../config/database";
-import env from "../config/env";
+import { env, prisma } from "@/config";
 import argon2 from "argon2";
 
 async function seedSuperadmin() {
@@ -23,7 +22,8 @@ async function seedSuperadmin() {
                 },
             });
         }
-    } catch (_error) {
+    } catch (error) {
+        console.log(error)
         console.error("❌ Failed to create superadmin, try again");
     }
 }

@@ -1,6 +1,6 @@
 import morgan, { StreamOptions } from "morgan";
 import { Request } from "express";
-import logger from "../utils/logger.util";
+import { logger } from "@/utils";
 
 const morganFormat = ":method :url :status - :response-time ms [RequestID: :requestId]";
 const stream: StreamOptions = {

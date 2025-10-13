@@ -1,6 +1,6 @@
-import { AuthReq } from "../middlewares/auth.middleware";
-import { cartItemSchema } from "../schemas";
-import { cartItemService } from "../services";
+import { AuthReq } from "@/middlewares";
+import { cartItemSchema } from "@/schemas";
+import { cartItemService } from "@/services";
 import { Request, Response, NextFunction } from "express";
 
 export const getUserCartItems = async (req: Request, res: Response, next: NextFunction) => {

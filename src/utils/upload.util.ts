@@ -1,5 +1,5 @@
-import ErrorCode from "../constants/error-code";
-import { UnprocessableUntityException } from "../exceptions";
+import ErrorCode from "@/constants/error-code";
+import { UnprocessableUntityException } from "@/exceptions";
 import { Request, Response, NextFunction } from "express";
 import multer, { FileFilterCallback } from "multer";
 const storage = multer.memoryStorage();

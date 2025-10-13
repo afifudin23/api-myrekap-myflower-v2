@@ -1,6 +1,6 @@
-import { prisma } from "../config";
-import ErrorCode from "../constants/error-code";
-import { BadRequestException, NotFoundException, UnauthorizedException } from "../exceptions";
+import { prisma } from "@/config";
+import ErrorCode from "@/constants/error-code";
+import { BadRequestException, NotFoundException, UnauthorizedException } from "@/exceptions";
 
 export const findAll = async (productId: string) => {
     const product = await prisma.product.findUnique({ where: { id: productId } });

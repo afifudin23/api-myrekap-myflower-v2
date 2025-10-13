@@ -84,20 +84,6 @@ export const formatRupiah = (data: number) => {
     }).format(data);
 };
 
-export const generatedTextLink = (data: any) => {
-    return encodeURIComponent(`💐 Halo Mas Afif, Ada Pesanan Baru! 📦
-Nama: ${formatCapital(data.customerName)}
-Total: ${formatRupiah(data.totalPrice + data.shippingCost)}
-Opsi Pengiriman: ${formatCapital(data.deliveryOption)}
-Alamat: ${data.deliveryAddress ? formatCapital(data.deliveryAddress) : "-"}
-Deadline: ${isoDateToStringDateTime(data.readyDate)} WIB
-Items:
-${data.items
-    .map((item: any, index: number) => `${index + 1}. ${formatCapital(item.product?.name)} x${item.quantity}`)
-    .join("\n")}
-`);
-};
-
 export const formatItemsAsList = (items: any[]) => {
     return items
         .map(

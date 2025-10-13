@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import ForbiddenException from "../exceptions/forbidden";
-import prisma from "../config/database";
-import { BadRequestException, NotFoundException } from "../exceptions";
-import ErrorCode from "../constants/error-code";
+import { BadRequestException, ForbiddenException, NotFoundException } from "../exceptions";
+import ErrorCode from "@/constants/error-code";
+import { prisma } from "@/config";
 
 const singleSuperadminMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
     const { id } = req.params;
