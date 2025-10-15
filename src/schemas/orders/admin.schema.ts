@@ -1,4 +1,3 @@
-import { formatters } from "@/utils";
 import { z } from "zod";
 
 const itemSchema = z.object({
@@ -16,13 +15,13 @@ export const create = z
             invalid_type_error: "Customer name must be a string",
             required_error: "Customer name is required",
         }),
-        // customerCategory: z.preprocess(
-        //     (value) => (typeof value === "string" ? formatters.parseCapital(value) : value),
-        //     z.enum(["UMUM", "PEMDA", "AKADEMIK", "RUMAH_SAKIT", "POLISI_MILITER", "PERBANKAN"], {
-        //         required_error: "Customer category is required",
-        //         invalid_type_error: "Customer category must be a valid enum value",
-        //     })
-        // ),
+        customerCategory: z.preprocess(
+            (value) => (typeof value === "string" ? (value).toUpperCase() : value),
+            z.enum(["UMUM", "PEMDA", "AKADEMIK", "RUMAH_SAKIT", "POLISI_MILITER", "PERBANKAN"], {
+                required_error: "Customer category is required",
+                invalid_type_error: "Customer category must be a valid enum value",
+            })
+        ),
         phoneNumber: z
             .string({ invalid_type_error: "Phone number must be a string", required_error: "Phone number is required" })
             .nonempty("Phone number is required"),
@@ -34,7 +33,7 @@ export const create = z
             })
             .pipe(z.array(itemSchema)),
         deliveryOption: z.preprocess(
-            (value) => (typeof value === "string" ? formatters.parseCapital(value) : value),
+            (value) => (typeof value === "string" ? (value).toUpperCase() : value),
             z.enum(["PICKUP", "DELIVERY"], {
                 required_error: "Delivery option is required",
                 invalid_type_error: "Delivery option must be a valid enum value",
@@ -76,7 +75,7 @@ export const update = z
             .nullish(),
         // customerCategory: z
         //     .preprocess(
-        //         (value) => (typeof value === "string" ? formatters.parseCapital(value) : value),
+        //         (value) => (typeof value === "string" ? (value).toUpperCase() : value),
         //         z.enum(["UMUM", "PEMDA", "AKADEMIK", "RUMAH_SAKIT", "POLISI_MILITER", "PERBANKAN"], {
         //             required_error: "Customer category is required",
         //             invalid_type_error: "Customer category must be a valid enum value",
@@ -96,7 +95,7 @@ export const update = z
             .pipe(z.array(itemSchema))
             .nullish(),
         deliveryOption: z.preprocess(
-            (value) => (typeof value === "string" ? formatters.parseCapital(value) : value),
+            (value) => (typeof value === "string" ? (value).toUpperCase() : value),
             z
                 .enum(["PICKUP", "DELIVERY"], {
                     required_error: "Delivery option is required",
@@ -142,7 +141,7 @@ export const update = z
 
 export const updateOrderStatus = z.object({
     orderStatus: z.preprocess(
-        (value) => (typeof value === "string" ? formatters.parseCapital(value) : value),
+        (value) => (typeof value === "string" ? (value).toUpperCase() : value),
         z.enum(["COMPLETED", "DELIVERY", "IN_PROCESS", "CANCELED"], {
             required_error: "Order status is required",
             invalid_type_error: "Order status must be a valid enum value",

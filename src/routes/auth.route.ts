@@ -5,13 +5,12 @@ import { errorHandler } from "@/utils";
 
 const authRouter: Router = Router();
 
-authRouter.post("/login", errorHandler(authController.loginUser));
+authRouter.post("/login", errorHandler(authController.login));
+authRouter.post("/logout", authMiddleware, errorHandler(authController.logout));
 authRouter.post("/register", errorHandler(authController.registerCustomer));
-authRouter.post("/resend-verify-email", errorHandler(authController.resendVerificationEmail));
-authRouter.get("/verify-email", errorHandler(authController.verifyEmail));
-authRouter.get("/verify", authMiddleware, errorHandler(authController.verify));
-authRouter.post("/forgot-password", errorHandler(authController.forgotPassword));
-authRouter.post("/reset-password", errorHandler(authController.resetPassword));
-authRouter.post("/logout", authMiddleware, errorHandler(authController.logoutUser));
+authRouter.get("/verify-auth", authMiddleware, errorHandler(authController.verifyAuth));
+authRouter.post("/otp/resend", errorHandler(authController.resendUserOtp));
+authRouter.post("/otp/verify", errorHandler(authController.verifyUserOtp));
+authRouter.put("/reset-password", errorHandler(authController.resetPassword));
 
 export default authRouter;

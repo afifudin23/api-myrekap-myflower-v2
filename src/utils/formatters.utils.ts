@@ -11,7 +11,7 @@ export function generateCode(type: "order" | "product") {
 
         case "product":
             return `PRD-${randomPrefix}${timestamp}-${randomSuffix}`;
-            
+
         default:
             throw new Error("Invalid type");
     }
@@ -72,9 +72,6 @@ export const formatCapital = (data: string) => {
         .replace(/_/g, " ") // change underscore to space
         .replace(/\b\w/g, (char) => char.toUpperCase()); // cpitalize each word
 };
-export const parseCapital = (data: string) => {
-    return data.toUpperCase().replace(/[ /-]/g, "_"); // Replace spaces and slashes with underscores
-};
 
 export const formatRupiah = (data: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -104,12 +101,17 @@ export const generateItemDetails = (orderItems: any[]) => {
     }));
 };
 
-export const getAppName = (role: string) => {
-    switch (role) {
-        case "SUPERADMIN":
-        case "ADMIN":
-            return "MyRekap";
-        case "CUSTOMER":
-            return "MyFlower";
-    }
+export const generateOtpType = {
+    EMAIL_VERIFICATION: "Verifikasi Email",
+    PASSWORD_RESET: "Reset Password",
+};
+
+export const purposeOtpType = {
+    EMAIL_VERIFICATION: "menyelesaikan proses masuk / pendaftaran",
+    PASSWORD_RESET: "mereset kata sandi akun Anda",
+};
+
+export const appNameType = {
+    myrekap: "MyRekap",
+    myflower: "MyFlower",
 };

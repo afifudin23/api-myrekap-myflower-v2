@@ -1,7 +1,6 @@
 import argon2 from "argon2";
 import ErrorCode from "@/constants/error-code";
 import { BadRequestException, InternalException, NotFoundException, UnauthorizedException } from "@/exceptions";
-import { mailerService } from "@/services";
 import { prisma } from "@/config";
 
 export const findAllAdmins = async () => {
@@ -53,7 +52,6 @@ export const create = async (body: any) => {
         },
     });
 
-    await mailerService.sendVerificationEmail(user);
     const { password: remove, ...data } = user;
     return data;
 };

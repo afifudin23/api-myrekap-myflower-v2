@@ -2,7 +2,6 @@ import ErrorCode from "@/constants/error-code";
 import { BadRequestException, InternalException, NotFoundException } from "@/exceptions";
 import { cloudinary, prisma, uploadFile } from "@/config";
 import { formatters } from "@/utils";
-import { mailerService } from "@/services";
 
 export const getAllOrders = async (query: any) => {
     const { month, year, from_date, to_date, customer_category, payment_method, payment_status, order_status } = query;
@@ -427,7 +426,7 @@ export const updateProgress = async (
     try {
         const result = await prisma.$transaction(transactionOps);
         const updatedOrder = result.at(-1);
-        if (order.source === "MYFLOWER") mailerService.sendUpdateOrderStatusEmail(updatedOrder);
+        // if (order.source === "MYFLOWER") mailerService.sendUpdateOrderStatusEmail(updatedOrder);
         return updatedOrder;
     } catch (_error) {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);

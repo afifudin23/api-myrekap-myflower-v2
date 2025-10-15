@@ -8,5 +8,4 @@ export * as cartItemService from "@/services/cart-item.service";
 export * as transactionService from "@/services/transaction.service";
 export * as reviewService from "@/services/review.service";
 export * as mailerService from "@/services/mailer.service";
-export * as tokenService from "@/services/token.service";
 export * as reportService from "@/services/report.service";

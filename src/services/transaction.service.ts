@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { formatters } from "@/utils";
 import { InternalException, MidtransException, NotFoundException } from "@/exceptions";
 import ErrorCode from "@/constants/error-code";
-import { mailerService, ordersCustomerService } from "@/services";
+import { ordersCustomerService } from "@/services";
 import { prisma } from "@/config";
 
 const snap = new midtransClient.Snap({
@@ -51,7 +51,7 @@ export const notification = async (data: any) => {
                     },
                     include: { user: true, items: { include: { product: true } } },
                 });
-                await mailerService.sendCustomerOrderStatusEmail(updatedOrder.user, "create", updatedOrder);
+                // await mailerService.sendCustomerOrderStatusEmail(updatedOrder.user, "create", updatedOrder);
                 await ordersCustomerService.notification(updatedOrder);
                 await prisma.cartItem.deleteMany({ where: { userId: updatedOrder.userId } });
                 break;
