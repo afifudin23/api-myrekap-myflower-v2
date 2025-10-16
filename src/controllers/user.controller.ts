@@ -18,18 +18,6 @@ export const getAllCustomers = async (_req: Request, res: Response) => {
     });
 };
 
-export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const data = await userService.findById(req.params.id);
-        res.status(200).json({
-            messege: "User retrieved successfully",
-            data,
-        });
-    } catch (error) {
-        return next(error);
-    }
-};
-
 export const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
     const body = userSchema.create.parse(req.body);
     try {
@@ -43,19 +31,6 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-export const updateUserProfile = async (req: Request, res: Response, next: NextFunction) => {
-    const body = userSchema.updateProfile.parse(req.body);
-    try {
-        const userId = (req as any).user.id;
-        const data = await userService.updateProfile(userId, body);
-        res.status(200).json({
-            message: "User updated successfully",
-            data,
-        });
-    } catch (error) {
-        return next(error);
-    }
-};
 
 export const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
     const body = userSchema.update.parse(req.body);
@@ -70,6 +45,19 @@ export const updateAdmin = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
+export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+    const body = userSchema.updateProfile.parse(req.body);
+    try {
+        const userId = (req as any).user.id;
+        const data = await userService.updateProfile(userId, body);
+        res.status(200).json({
+            message: "User updated successfully",
+            data,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data = await userService.remove(req.params.id);

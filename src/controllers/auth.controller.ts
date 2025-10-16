@@ -3,8 +3,7 @@ import { authService } from "@/services";
 import { authSchema } from "@/schemas";
 import { BadRequestException } from "@/exceptions";
 import ErrorCode from "@/constants/error-code";
-
-export type AppNameType = "myrekap" | "myflower";
+import { AppNameType } from "@/middlewares";
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     const appName = (req.headers["x-app-name"] as string)?.toLowerCase() as AppNameType;
@@ -14,8 +13,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         const data = await authService.login(body, appName);
         if (data.needVerification)
             return res.status(200).json({ message: "Account not verified. OTP has been sent to your email.", data });
-
-        res.cookie(`token_${appName.toLowerCase()}`, data.token, {
+        res.cookie(`token_${appName}`, data.token, {
             httpOnly: true, // Tidak dapat diakses oleh JavaScript
             secure: false, // True = Hanya dikirim melalui HTTPS (penting untuk production)
             sameSite: "strict", // Tidak terkirim di request pihak ketiga

@@ -5,7 +5,7 @@ import { formatters } from "@/utils";
 import { OtpType } from "@prisma/client";
 import { addMinutes } from "date-fns";
 import crypto from "crypto";
-import { AppNameType } from "@/controllers/auth.controller";
+import { AppNameType } from "@/middlewares";
 
 interface GenerateUserOtpProps {
     userId: string;

@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 import { mailerService } from "@/services";
 import { env, prisma } from "@/config";
 import { OtpType } from "@prisma/client";
-import { AppNameType } from "@/controllers/auth.controller";
+import { AppNameType } from "@/middlewares";
 
 export const login = async (body: any, appName: AppNameType) => {
     // check if the user exists

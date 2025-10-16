@@ -11,6 +11,6 @@ authRouter.post("/register", errorHandler(authController.registerCustomer));
 authRouter.get("/verify-auth", authMiddleware, errorHandler(authController.verifyAuth));
 authRouter.post("/otp/resend", errorHandler(authController.resendUserOtp));
 authRouter.post("/otp/verify", errorHandler(authController.verifyUserOtp));
-authRouter.put("/reset-password", errorHandler(authController.resetPassword));
+authRouter.patch("/reset-password", errorHandler(authController.resetPassword));
 
 export default authRouter;

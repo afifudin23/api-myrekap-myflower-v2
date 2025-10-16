@@ -1,4 +1,4 @@
-import z, { object, string } from "zod";
+import z, { object, string, TypeOf } from "zod";
 
 export const create = z
     .object({
@@ -18,24 +18,49 @@ export const create = z
             });
         }
     });
+export type CreateType = TypeOf<typeof create>;
 
 export const update = object({
-    fullName: string().nullish(),
-    username: string().nullish(),
-    email: string().email().nullish(),
-    phoneNumber: string().nullish(),
-    password: string().nullish(),
-    confPassword: string().nullish(),
-    role: z.enum(["ADMIN"]).nullish(),
+    fullName: string().optional(),
+    username: string().optional(),
+    email: string().email().optional(),
+    phoneNumber: string().optional(),
+    password: string().nullish().optional(),
+    confPassword: string().nullish().optional(),
+}).superRefine((data, ctx) => {
+    if (data.password || data.confPassword) {
+        if (!data.password) {
+            ctx.addIssue({
+                path: ["password"],
+                message: "Password is required",
+                code: z.ZodIssueCode.custom,
+            });
+        } else if (!data.confPassword) {
+            ctx.addIssue({
+                path: ["confPassword"],
+                message: "Confirmation password is required",
+                code: z.ZodIssueCode.custom,
+            });
+        } else if (data.password !== data.confPassword) {
+            ctx.addIssue({
+                path: ["password", "confPassword"],
+                message: "Confirm password does not match new password",
+                code: z.ZodIssueCode.custom,
+            });
+        }
+        data.confPassword = undefined;
+    }
 });
 
+export type UpdateType = TypeOf<typeof update>;
+
 export const updateProfile = object({
-    fullName: string().nullish(),
-    username: string().nullish(),
-    email: string().email().nullish(),
-    phoneNumber: string().nullish(),
+    fullName: string().optional(),
+    username: string().optional(),
+    email: string().email().optional(),
+    phoneNumber: string().optional(),
     customerCategory: z.preprocess(
-        (value) => (typeof value === "string" ? (value).toUpperCase() : value),
+        (value) => (typeof value === "string" ? value.toUpperCase() : value),
         z
             .enum(["UMUM", "PEMDA", "PERBANKAN"], {
                 required_error: "Customer category is required",
@@ -43,9 +68,9 @@ export const updateProfile = object({
             })
             .nullish()
     ),
-    oldPassword: string().nullish(),
-    newPassword: string().nullish(),
-    confPassword: string().nullish(),
+    oldPassword: string().optional(),
+    newPassword: string().optional(),
+    confPassword: string().optional(),
 }).superRefine((data, ctx) => {
     const oneFilled = !!(data.oldPassword || data.newPassword || data.confPassword);
     const allFilled = !!(data.oldPassword && data.newPassword && data.confPassword);
@@ -74,11 +99,24 @@ export const updateProfile = object({
         }
     }
 
-    if (data.newPassword && data.confPassword && data.newPassword !== data.confPassword) {
-        ctx.addIssue({
-            path: ["confPassword"],
-            message: "Confirm password does not match new password",
-            code: z.ZodIssueCode.custom,
-        });
+    if (allFilled) {
+        if (data.oldPassword === data.newPassword) {
+            ctx.addIssue({
+                path: ["newPassword"],
+                message: "New password cannot be the same as old password",
+                code: z.ZodIssueCode.custom,
+            });
+        }
+
+        if (data.newPassword && data.confPassword && data.newPassword !== data.confPassword) {
+            ctx.addIssue({
+                path: ["confPassword"],
+                message: "Confirm password does not match new password",
+                code: z.ZodIssueCode.custom,
+            });
+        }
     }
+    return data;
 });
+
+export type UpdateProfileType = TypeOf<typeof updateProfile>;

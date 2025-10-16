@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import ErrorCode from "@/constants/error-code";
 import { BadRequestException, InternalException, NotFoundException, UnauthorizedException } from "@/exceptions";
 import { prisma } from "@/config";
+import { userSchema } from "@/schemas";
 
 export const findAllAdmins = async () => {
     const user = await prisma.user.findMany({ where: { role: { in: ["ADMIN", "SUPERADMIN"] } } });
@@ -16,22 +17,8 @@ export const findAllCustomers = async () => {
     return data;
 };
 
-export const findById = async (id: string) => {
-    try {
-        const user = await prisma.user.findFirstOrThrow({
-            where: {
-                id,
-            },
-        });
-        const { password, ...data } = user;
-        return data;
-    } catch (_error) {
-        throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
-    }
-};
-
-export const create = async (body: any) => {
-    const { username, email, password } = body;
+export const create = async (body: userSchema.CreateType) => {
+    const { username, email } = body;
 
     // check if the username or email is already taken
     const existingUser = await prisma.user.findFirst({
@@ -42,95 +29,52 @@ export const create = async (body: any) => {
         throw new BadRequestException("The username or email is already taken", ErrorCode.USER_ALREADY_EXISTS);
 
     // hash password and create user
-    const hashPassword = await argon2.hash(password);
-    delete body.confPassword;
+    const hashPassword = await argon2.hash(body.password);
     const user = await prisma.user.create({
         data: {
-            ...body,
+            fullName: body.fullName,
+            username,
+            email,
+            phoneNumber: body.phoneNumber,
             password: hashPassword,
             role: "ADMIN",
         },
     });
 
-    const { password: remove, ...data } = user;
+    const { password, ...data } = user;
     return data;
 };
 
-export const updateProfile = async (userId: string, body: any) => {
-    // validation user exists
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
-
-    // check if update profile with change password
-    const { oldPassword, newPassword, confPassword, ...bodyWithoutPassword } = body;
-    if (oldPassword || newPassword || confPassword) {
-        // check if the password is correct
-        const isPasswordValid = await argon2.verify(user.password, oldPassword);
-        if (!isPasswordValid) throw new UnauthorizedException("Invalid Password", ErrorCode.INVALID_PASSWORD);
-
-        const hashPassword = await argon2.hash(newPassword);
-        try {
-            const updatedUser = await prisma.user.update({
-                where: { id: userId },
-                data: {
-                    fullName: body.fullName,
-                    username: body.username,
-                    email: body.email,
-                    phoneNumber: body.phoneNumber,
-                    password: hashPassword,
-                },
-            });
-            const { password: remove, ...data } = updatedUser;
-            return data;
-        } catch (error) {
-            throw new InternalException("Update profile failed", ErrorCode.INTERNAL_EXCEPTION, error);
-        }
-    }
-
-    try {
-        const data = await prisma.user.update({
-            where: { id: userId },
-            data: bodyWithoutPassword,
-        });
-        return data;
-    } catch (error) {
-        throw new InternalException("Update profile failed", ErrorCode.INTERNAL_EXCEPTION, error);
-    }
-};
-
-export const update = async (id: string, body: any) => {
-    const { fullName, username, email, phoneNumber, password, confPassword } = body;
+export const update = async (id: string, body: userSchema.UpdateType) => {
+    const { fullName, username, email, phoneNumber } = body;
 
     // check if the user exists
     const findUser = await prisma.user.findUnique({ where: { id } });
-    if (!findUser) {
-        throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
-    }
+    if (!findUser) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
 
     // check if the username or email is already taken
     const existingUser = await prisma.user.findFirst({
-        where: {
-            AND: { OR: [{ username }, { email }], NOT: { id } },
-        },
-        select: {
-            id: true,
-        },
+        where: { AND: { OR: [{ username }, { email }], NOT: { id } } },
+        select: { id: true },
     });
-    if (existingUser) {
+
+    if (existingUser)
         throw new BadRequestException("The username or email is already taken", ErrorCode.USER_ALREADY_EXISTS);
-    }
-    if (password || confPassword) {
-        if (password !== confPassword) {
-            throw new BadRequestException("Password confirmation does not match", ErrorCode.PASSWORD_MISMATCH);
-        }
-        const hashPassword = await argon2.hash(password);
+
+    if (body.password) {
+        const hashPassword = await argon2.hash(body.password);
         body.password = hashPassword;
-        body.confPassword = undefined;
         const user = await prisma.user.update({
             where: { id },
-            data: body,
+            data: {
+                fullName,
+                username,
+                email,
+                phoneNumber,
+                password: hashPassword,
+            },
         });
-        const { password: remove, ...data } = user;
+        const { password, ...data } = user;
         return data;
     }
     const user = await prisma.user.update({
@@ -143,6 +87,49 @@ export const update = async (id: string, body: any) => {
         },
     });
     return user;
+};
+
+export const updateProfile = async (userId: string, body: userSchema.UpdateProfileType) => {
+    // validation user exists
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
+
+    // check if update profile with change password
+    const { oldPassword, newPassword, confPassword, ...bodyWithoutPassword } = body;
+    if (oldPassword && newPassword && confPassword) {
+        // check if the password is correct
+        const isPasswordValid = await argon2.verify(user.password, oldPassword!);
+        if (!isPasswordValid) throw new UnauthorizedException("Invalid Password", ErrorCode.INVALID_PASSWORD);
+
+        const hashPassword = await argon2.hash(newPassword!);
+        try {
+            const updatedUser = await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    fullName: body.fullName,
+                    username: body.username,
+                    email: body.email,
+                    phoneNumber: body.phoneNumber,
+                    password: hashPassword,
+                },
+            });
+            const { password, ...data } = updatedUser;
+            return data;
+        } catch (error) {
+            throw new InternalException("Update profile failed", ErrorCode.INTERNAL_EXCEPTION, error);
+        }
+    }
+
+    try {
+        const userUpdated = await prisma.user.update({
+            where: { id: userId },
+            data: bodyWithoutPassword,
+        });
+        const { password, ...data } = userUpdated;
+        return data;
+    } catch (error) {
+        throw new InternalException("Update profile failed", ErrorCode.INTERNAL_EXCEPTION, error);
+    }
 };
 
 export const remove = async (id: string) => {
