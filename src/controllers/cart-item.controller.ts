@@ -1,3 +1,5 @@
+import ErrorCode from "@/constants/error-code";
+import { UnprocessableUntityException } from "@/exceptions";
 import { AuthReq } from "@/middlewares";
 import { cartItemSchema } from "@/schemas";
 import { cartItemService } from "@/services";
@@ -26,20 +28,18 @@ export const addToCart = async (req: Request, res: Response, next: NextFunction)
     }
 };
 
-export const incrementCartItem = async (req: Request, res: Response, next: NextFunction) => {
+export const updateQuantity = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = (req as AuthReq).user.id;
-        const data = await cartItemService.incrementItem(userId, req.params.productId);
-        res.json({ message: "Cart item incremented successfully", data });
-    } catch (error) {
-        return next(error);
-    }
-};
-
-export const decrementCartItem = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = (req as AuthReq).user.id;
-        const { data, updated } = await cartItemService.decrementItem(userId, req.params.productId);
+        const action = req.params.action.toLowerCase() as "increment" | "decrement";
+        if (!["increment", "decrement"].includes(action)) {
+            throw new UnprocessableUntityException(
+                "Action must be 'increment' or 'decrement'",
+                ErrorCode.UNPROCESSABLE_ENTITY,
+                null
+            );
+        }
+        const { data, updated } = await cartItemService.updateQuantity(userId, req.params.productId, action);
         res.json({ message: updated ? "Cart item decremented successfully" : "Cart item deleted successfully", data });
     } catch (error) {
         return next(error);

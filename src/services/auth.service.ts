@@ -1,11 +1,12 @@
 import argon2 from "argon2";
 import ErrorCode from "@/constants/error-code";
-import { BadRequestException, NotFoundException, UnauthorizedException } from "../exceptions";
+import { BadRequestException, InternalException, NotFoundException, UnauthorizedException } from "../exceptions";
 import * as jwt from "jsonwebtoken";
 import { mailerService } from "@/services";
 import { env, prisma } from "@/config";
 import { OtpType } from "@prisma/client";
 import { AppNameType } from "@/middlewares";
+import { formatters } from "@/utils";
 
 export const login = async (body: any, appName: AppNameType) => {
     // check if the user exists
@@ -28,9 +29,8 @@ export const login = async (body: any, appName: AppNameType) => {
     }
 
     // generate token
-    const { password, ...data } = user;
     const token = jwt.sign({ id: user.id }, env.JWT_ACCESS, { expiresIn: "1d" });
-    return { data, token };
+    return { data: { fullName: user.fullName, role: user.role }, token };
 };
 
 export const registerCustomer = async (body: any) => {
@@ -44,17 +44,25 @@ export const registerCustomer = async (body: any) => {
 
     // hash password and create user
     delete body.confPassword;
-    const hashPassword = await argon2.hash(body.password);
-    const user = await prisma.user.create({
-        data: {
-            ...body,
-            password: hashPassword,
-            role: "CUSTOMER",
-        },
-    });
+    try {
+        const hashPassword = await argon2.hash(body.password);
+        const user = await prisma.user.create({
+            data: {
+                userCode: formatters.generateCode("user"),
+                fullName: body.fullName,
+                username: body.username,
+                email: body.email,
+                phoneNumber: body.phoneNumber,
+                password: hashPassword,
+                role: "CUSTOMER",
+            },
+        });
 
-    // generate token and send verification email
-    await mailerService.resendUserOtp(user, "EMAIL_VERIFICATION", "myflower");
+        // generate token and send verification email
+        await mailerService.resendUserOtp(user, "EMAIL_VERIFICATION", "myflower");
+    } catch (error) {
+        throw new InternalException("Register user customer failed", ErrorCode.INTERNAL_EXCEPTION, error);
+    }
 };
 
 export const resendOtp = async (email: string, type: OtpType, appName: "myrekap" | "myflower") => {

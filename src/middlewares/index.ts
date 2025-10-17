@@ -4,4 +4,4 @@ export { default as singleSuperadminMiddleware } from "./single-superadmin.middl
 export { default as superadminMiddleware } from "./superadmin.middleware";
 export { default as httpLogger } from "./logger.middleware";
 export { default as attachLogger } from "./request-logger.middleware";
-export { default as requireMyrekapApp } from "./only-myrekap.middleware";
+export { requireMyRekapApp, requireMyFlowerApp } from "./required-appname.middleware";

@@ -7,7 +7,7 @@ export const findAll = async (userId: string) => {
     return await prisma.cartItem.findMany({
         where: { userId },
         include: {
-            product: { include: { images: true } },
+            product: { include: { images: { take: 1 } } },
         },
     });
 };
@@ -38,22 +38,10 @@ export const upsertItem = async (userId: string, data: cartItemSchema.AddToCartT
     }
 };
 
-export const incrementItem = async (userId: string, productId: string) => {
-    try {
-        return await prisma.cartItem.update({
-            where: { userId_productId: { userId, productId } },
-            data: { quantity: { increment: 1 } },
-        });
-    } catch (_error) {
-        throw new NotFoundException("Cart item not found", ErrorCode.CART_ITEM_NOT_FOUND);
-    }
-};
-
-export const decrementItem = async (userId: string, productId: string) => {
+export const updateQuantity = async (userId: string, productId: string, action: "increment" | "decrement") => {
     try {
         const item = await prisma.cartItem.findUniqueOrThrow({ where: { userId_productId: { userId, productId } } });
-
-        if (item.quantity <= 1) {
+        if (item.quantity <= 1 && action === "decrement") {
             return {
                 data: await prisma.cartItem.delete({ where: { id: item.id } }),
                 updated: false,
@@ -62,7 +50,7 @@ export const decrementItem = async (userId: string, productId: string) => {
         return {
             data: await prisma.cartItem.update({
                 where: { id: item.id },
-                data: { quantity: { decrement: 1 } },
+                data: action === "increment" ? { quantity: { increment: 1 } } : { quantity: { decrement: 1 } },
             }),
             updated: true,
         };

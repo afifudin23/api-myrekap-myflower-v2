@@ -121,11 +121,13 @@ export const update = async (id: string, body: productSchema.UpdateType, files: 
         }
 
         // Update product
-        const { publicIdsToDelete, ...cleanBody } = body;
         return await prisma.product.update({
             where: { id },
             data: {
-                ...cleanBody,
+                name: body.name,
+                price: body.price,
+                description: body.description,
+                isActive: body.isActive,
                 images: { create: uploadResults.map((result) => result) },
             },
             include: { images: true },
