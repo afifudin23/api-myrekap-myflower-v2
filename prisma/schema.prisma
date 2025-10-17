@@ -12,12 +12,13 @@ generator client {
 }
 
 datasource db {
-  provider          = "mysql"
-  url               = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id               String            @id @default(cuid())
+  userCode         String            @unique @map("user_code")
   fullName         String            @map("full_name")
   username         String            @unique @map("username")
   email            String            @unique @map("email")
@@ -49,6 +50,7 @@ model UserOtp {
 
   @@map("user_otp")
 }
+
 enum OtpType {
   EMAIL_VERIFICATION @map("email_verification")
   PASSWORD_RESET     @map("password_reset")
@@ -70,31 +72,46 @@ model Product {
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  images     ProductImage[]
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-  reviews    Review[]
-  histories  ProductHistory[]
+  images       ProductImage[]
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  reviews      Review[]
+  transactions StockTransaction[]
+  reports      MonthlyStockReport[]
 
   @@map("products")
 }
 
-model ProductHistory {
-  id        String      @id @default(cuid())
-  productId String      @map("product_id")
-  type      HistoryType @map("type")
-  quantity  Int         @map("quantity")
-  note      String     @map("note")
-  createdAt DateTime    @default(now()) @map("created_at")
+model StockTransaction {
+  id        String    @id @default(cuid())
+  productId String    @map("product_id")
+  type      StockType @map("type")
+  quantity  Int       @map("quantity")
+  note      String    @map("note")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   product Product @relation(fields: [productId], references: [id])
 
-  @@map("product_histories")
+  @@map("stock_transactions")
 }
 
-enum HistoryType {
+enum StockType {
   STOCK_IN  @map("stock_in")
   STOCK_OUT @map("stock_out")
+}
+
+model MonthlyStockReport {
+  id           String   @id @default(cuid())
+  productId    String   @map("product_id")
+  month        Int      @map("month")
+  year         Int      @map("year")
+  initialStock Int      @map("initial_stock")
+  stockIn      Int      @map("stock_in")
+  stockOut     Int      @map("stock_out")
+  finalStock   Int      @map("final_stock")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model ProductImage {

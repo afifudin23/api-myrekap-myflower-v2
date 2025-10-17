@@ -78,7 +78,7 @@ export const create = async (userId: string, body: any, file: Express.Multer.Fil
                 where: { id: item.productId },
                 data: { stock: { decrement: item.quantity } },
             }),
-            prisma.productHistory.create({
+            prisma.stockTransaction.create({
                 data: {
                     type: "STOCK_OUT",
                     quantity: item.quantity,
@@ -104,7 +104,7 @@ export const create = async (userId: string, body: any, file: Express.Multer.Fil
     try {
         let uploadedFile;
         if (file && body.paymentMethod === "BANK_TRANSFER") {
-            uploadedFile = await uploadFile(file, "myflower-myrekap/bukti-transfer");
+            uploadedFile = await uploadFile(file, "myrekap-v2/bukti-transfer", orderCode);
         }
         const createOrder = prisma.order.create({
             data: {
@@ -194,7 +194,7 @@ export const update = async (id: string, body: any, file: Express.Multer.File) =
                             where: { id: item.productId },
                             data: { stock: { decrement: qtyDifference } },
                         }),
-                        prisma.productHistory.create({
+                        prisma.stockTransaction.create({
                             data: {
                                 type: qtyDifference < 0 ? "STOCK_IN" : "STOCK_OUT",
                                 quantity: Math.abs(qtyDifference),
@@ -218,7 +218,7 @@ export const update = async (id: string, body: any, file: Express.Multer.File) =
                         where: { id: item.productId },
                         data: { stock: { decrement: item.quantity } },
                     }),
-                    prisma.productHistory.create({
+                    prisma.stockTransaction.create({
                         data: {
                             type: "STOCK_OUT",
                             quantity: item.quantity,
@@ -241,7 +241,7 @@ export const update = async (id: string, body: any, file: Express.Multer.File) =
                         where: { id: item.productId },
                         data: { stock: { increment: item.quantity } },
                     }),
-                    prisma.productHistory.create({
+                    prisma.stockTransaction.create({
                         data: {
                             type: "STOCK_IN",
                             quantity: item.quantity,
@@ -278,7 +278,7 @@ export const update = async (id: string, body: any, file: Express.Multer.File) =
             await prisma.paymentProof.delete({ where: { id: existingProof.id } });
         }
 
-        const result = await uploadFile(file, "myflower-myrekap/bukti-transfer");
+        const result = await uploadFile(file, "myflower-myrekap/bukti-transfer", existingOrder.orderCode);
 
         await prisma.paymentProof.create({
             data: {
@@ -325,6 +325,10 @@ export const updateProgress = async (
     orderStatus: "COMPLETED" | "DELIVERY" | "IN_PROCESS" | "CANCELED",
     finishedProduct?: Express.Multer.File
 ) => {
+    // Check if order exists
+    const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
+    if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
+
     // Check if finished product exists
     if (finishedProduct) {
         // Delete existing finished product
@@ -335,7 +339,7 @@ export const updateProgress = async (
         }
 
         // Upload new finished product
-        const result = await uploadFile(finishedProduct, "myflower-myrekap/produk-selesai");
+        const result = await uploadFile(finishedProduct, "myflower-myrekap/produk-selesai", order?.orderCode);
         await prisma.finishedProduct.create({
             data: {
                 fileName: finishedProduct.originalname,
@@ -346,10 +350,6 @@ export const updateProgress = async (
             },
         });
     }
-
-    // Check if order exists
-    const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
-    if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
 
     // Update order status
     const dataOrderStatus: any = { orderStatus };
@@ -366,7 +366,7 @@ export const updateProgress = async (
                     where: { id: item.productId },
                     data: { stock: { increment: item.quantity } },
                 }),
-                prisma.productHistory.create({
+                prisma.stockTransaction.create({
                     data: {
                         type: "STOCK_IN",
                         quantity: item.quantity,
@@ -396,7 +396,7 @@ export const updateProgress = async (
                     where: { id: item.productId },
                     data: { stock: { decrement: item.quantity } },
                 }),
-                prisma.productHistory.create({
+                prisma.stockTransaction.create({
                     data: {
                         type: "STOCK_OUT",
                         quantity: item.quantity,

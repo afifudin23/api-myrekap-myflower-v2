@@ -27,7 +27,7 @@ export const create = async (user: any, data: ordersCustomerSchema.CreateType) =
                 where: { id: cartItem.productId },
                 data: { stock: { decrement: cartItem.quantity } },
             }),
-            prisma.productHistory.create({
+            prisma.stockTransaction.create({
                 data: {
                     type: "STOCK_OUT",
                     quantity: cartItem.quantity,
@@ -109,8 +109,8 @@ export const remove = async (orderCode: string) => {
             prisma.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } })
         );
 
-        // Hapus productHistory terakhir (terkait item ini)
-        const latestHistory = await prisma.productHistory.findFirst({
+        // Hapus stockTransaction terakhir (terkait item ini)
+        const latestHistory = await prisma.stockTransaction.findFirst({
             where: {
                 productId: item.productId,
                 note: { contains: orderCode },
@@ -118,7 +118,7 @@ export const remove = async (orderCode: string) => {
             orderBy: { createdAt: "desc" },
         });
 
-        if (latestHistory) operations.push(prisma.productHistory.delete({ where: { id: latestHistory.id } }));
+        if (latestHistory) operations.push(prisma.stockTransaction.delete({ where: { id: latestHistory.id } }));
     }
     operations.push(prisma.order.delete({ where: { orderCode } }));
 
@@ -140,7 +140,7 @@ export const cancel = async (id: string) => {
     for (const item of order.items) {
         operations.push(
             prisma.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } }),
-            prisma.productHistory.create({
+            prisma.stockTransaction.create({
                 data: {
                     type: "STOCK_IN",
                     quantity: item.quantity,

@@ -1,4 +1,5 @@
 import { env, prisma } from "@/config";
+import { formatters } from "@/utils";
 import argon2 from "argon2";
 
 async function seedSuperadmin() {
@@ -12,6 +13,7 @@ async function seedSuperadmin() {
             const hashPassword = await argon2.hash(env.SUPERADMIN_PASSWORD);
             await prisma.user.create({
                 data: {
+                    userCode: formatters.generateCode("user"),
                     fullName: env.SUPERADMIN_FULL_NAME,
                     username: env.SUPERADMIN_USERNAME,
                     email: env.SUPERADMIN_EMAIL,

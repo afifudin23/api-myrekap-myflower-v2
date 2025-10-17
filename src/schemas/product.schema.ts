@@ -1,14 +1,14 @@
 import { z } from "zod";
 
-export const createProductSchema = z.object({
+export const create = z.object({
     name: z.string().transform((val) => val.trim()),
     price: z.coerce.number({ invalid_type_error: "Price must be a number" }).min(1, "Price must be greater than 0"),
     description: z.string().transform((val) => val.trim()),
 });
 
-export type CreateProductType = z.infer<typeof createProductSchema>;
+export type CreateType = z.infer<typeof create>;
 
-export const updateProductSchema = z.object({
+export const update = z.object({
     name: z
         .string()
         .transform((val) => val.trim())
@@ -24,7 +24,7 @@ export const updateProductSchema = z.object({
     isActive: z.coerce.boolean().optional(),
     publicIdsToDelete: z.array(z.string()).optional(),
 });
-export type UpdateProductType = z.infer<typeof updateProductSchema>;
+export type UpdateType = z.infer<typeof update>;
 
 export const manageStock = z.object({
     type: z.preprocess(
@@ -38,4 +38,9 @@ export const manageStock = z.object({
         .number({ invalid_type_error: "Quantity must be a number" })
         .min(1, "Quantity must be greater than 0"),
     note: z.string({ invalid_type_error: "Note must be a string" }).nonempty("Note is not empty").optional(),
+});
+
+export const createReport = z.object({
+    month: z.coerce.number({ invalid_type_error: "Month must be a number" }).min(1, "Month must be greater than 0"),
+    year: z.coerce.number({ invalid_type_error: "Year must be a number" }).min(1, "Year must be greater than 0"),
 });

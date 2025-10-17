@@ -35,6 +35,7 @@ export enum ErrorCode {
     REVIEW_PRODUCT_NOT_FOUND = 4006,
     REVIEW_ALREADY_EXISTS = 4007,
     STOCK_NOT_ENOUGH = 4008,
+    MONTHLY_STOCK_REPORT_NOT_FOUND = 4009,
 
     // Cart Item
     CART_ITEM_NOT_FOUND = 5001,
@@ -47,6 +48,7 @@ export enum ErrorCode {
 
     // Invalid Data
     UNPROCESSABLE_ENTITY = 8001,
+    CLOUDINARY_ERROR = 8002,
 
     // Internal Exception
     INTERNAL_EXCEPTION = 9001,

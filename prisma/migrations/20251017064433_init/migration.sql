@@ -1,6 +1,7 @@
 -- CreateTable
 CREATE TABLE `users` (
     `id` VARCHAR(191) NOT NULL,
+    `user_code` VARCHAR(191) NOT NULL,
     `full_name` VARCHAR(191) NOT NULL,
     `username` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
@@ -12,22 +13,21 @@ CREATE TABLE `users` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
+    UNIQUE INDEX `users_user_code_key`(`user_code`),
     UNIQUE INDEX `users_username_key`(`username`),
     UNIQUE INDEX `users_email_key`(`email`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `user_tokens` (
+CREATE TABLE `user_otp` (
     `id` VARCHAR(191) NOT NULL,
     `user_id` VARCHAR(191) NOT NULL,
-    `token` VARCHAR(191) NOT NULL,
-    `type` ENUM('verify_email', 'reset_password') NOT NULL,
-    `is_used` BOOLEAN NOT NULL DEFAULT false,
+    `code` VARCHAR(191) NOT NULL,
+    `type` ENUM('email_verification', 'password_reset') NOT NULL,
     `expires_at` DATETIME(3) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    INDEX `user_tokens_user_id_token_is_used_idx`(`user_id`, `token`, `is_used`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -48,12 +48,27 @@ CREATE TABLE `products` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `product_histories` (
+CREATE TABLE `stock_transactions` (
     `id` VARCHAR(191) NOT NULL,
     `product_id` VARCHAR(191) NOT NULL,
     `type` ENUM('stock_in', 'stock_out') NOT NULL,
     `quantity` INTEGER NOT NULL,
     `note` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `MonthlyStockReport` (
+    `id` VARCHAR(191) NOT NULL,
+    `product_id` VARCHAR(191) NOT NULL,
+    `month` INTEGER NOT NULL,
+    `year` INTEGER NOT NULL,
+    `initial_stock` INTEGER NOT NULL,
+    `stock_in` INTEGER NOT NULL,
+    `stock_out` INTEGER NOT NULL,
+    `final_stock` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -159,10 +174,13 @@ CREATE TABLE `reviews` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `user_tokens` ADD CONSTRAINT `user_tokens_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `user_otp` ADD CONSTRAINT `user_otp_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `product_histories` ADD CONSTRAINT `product_histories_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `stock_transactions` ADD CONSTRAINT `stock_transactions_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `MonthlyStockReport` ADD CONSTRAINT `MonthlyStockReport_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `product_images` ADD CONSTRAINT `product_images_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

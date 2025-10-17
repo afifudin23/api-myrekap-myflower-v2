@@ -1,14 +1,15 @@
 import crypto from "crypto";
 
-export function generateCode(type: "order" | "product") {
+export function generateCode(type: "user" | "order" | "product") {
     const randomPrefix = crypto.randomBytes(1).toString("hex").toUpperCase(); // 2 chars
     const timestamp = Date.now().toString(36).toUpperCase();
     const randomSuffix = crypto.randomBytes(3).toString("hex").toUpperCase();
 
     switch (type) {
+        case "user":
+            return `USR-${randomPrefix}${timestamp}-${randomSuffix}`;
         case "order":
             return `ORD-${randomPrefix}${timestamp}-${randomSuffix}`;
-
         case "product":
             return `PRD-${randomPrefix}${timestamp}-${randomSuffix}`;
 

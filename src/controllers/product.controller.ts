@@ -3,6 +3,7 @@ import { UnprocessableUntityException } from "../exceptions";
 import ErrorCode from "@/constants/error-code";
 import { productService } from "@/services";
 import { productSchema } from "@/schemas";
+import { AuthReq } from "@/middlewares";
 
 export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
     const files = req.files as Express.Multer.File[];
@@ -10,7 +11,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
     if (!files || files.length === 0) {
         throw new UnprocessableUntityException("Product image is required", ErrorCode.UNPROCESSABLE_ENTITY, null);
     }
-    const body = productSchema.createProductSchema.parse(req.body);
+    const body = productSchema.create.parse(req.body);
     try {
         const data = await productService.create(body, files);
         res.json({ message: "Product created successfully", data });
@@ -38,7 +39,7 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
 };
 
 export const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
-    const body = productSchema.updateProductSchema.parse({
+    const body = productSchema.update.parse({
         ...req.body,
         publicIdsToDelete: req.body.publicIdsToDelete
             ? Array.isArray(req.body.publicIdsToDelete)
@@ -66,8 +67,8 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
 export const manageProductStock = async (req: Request, res: Response, next: NextFunction) => {
     const body = productSchema.manageStock.parse(req.body);
     try {
-        const userId = (req as any).user.id;
-        const data = await productService.createStockHistory(req.params.id, userId, body);
+        const userId = (req as AuthReq).user.id;
+        const data = await productService.manageStock(req.params.id, userId, body);
         res.json({ message: "Product stock updated successfully", data });
     } catch (error) {
         return next(error);
@@ -83,7 +84,7 @@ export const getMonthlyStockReport = async (req: Request, res: Response, next: N
             null
         );
     }
-    if (!["summary", "stock_in", "stock_out"].includes(String(type))) {
+    if (!["summary", "stock_in", "stock_out"].includes(String(type).toLowerCase())) {
         throw new UnprocessableUntityException(
             "Type must be summary, stock_in or stock_out",
             ErrorCode.UNPROCESSABLE_ENTITY,
@@ -92,8 +93,18 @@ export const getMonthlyStockReport = async (req: Request, res: Response, next: N
     }
 
     try {
-        const data = await productService.stockReport(Number(month), Number(year), String(type).toUpperCase());
+        const data = await productService.getReport(Number(month), Number(year), String(type).toUpperCase());
         res.json({ message: "Monthly stock report retrieved successfully", data });
+    } catch (error) {
+        return next(error);
+    }
+};
+
+export const createMonthlyStockReport = async (req: Request, res: Response, next: NextFunction) => {
+    const body = productSchema.createReport.parse(req.body);
+    try {
+        await productService.createReport(body);
+        res.json({ message: "Monthly stock report created successfully" });
     } catch (error) {
         return next(error);
     }

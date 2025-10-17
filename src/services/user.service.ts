@@ -3,6 +3,7 @@ import ErrorCode from "@/constants/error-code";
 import { BadRequestException, InternalException, NotFoundException, UnauthorizedException } from "@/exceptions";
 import { prisma } from "@/config";
 import { userSchema } from "@/schemas";
+import { formatters } from "@/utils";
 
 export const findAllAdmins = async () => {
     const user = await prisma.user.findMany({ where: { role: { in: ["ADMIN", "SUPERADMIN"] } } });
@@ -32,6 +33,7 @@ export const create = async (body: userSchema.CreateType) => {
     const hashPassword = await argon2.hash(body.password);
     const user = await prisma.user.create({
         data: {
+            userCode: formatters.generateCode("user"),
             fullName: body.fullName,
             username,
             email,

@@ -1,7 +1,9 @@
 import ErrorCode from "@/constants/error-code";
 import { UnprocessableUntityException } from "@/exceptions";
+import { randomInt } from "crypto";
 import { Request, Response, NextFunction } from "express";
 import multer, { FileFilterCallback } from "multer";
+import path from "path";
 const storage = multer.memoryStorage();
 
 const fileFilter = (_req: any, file: any, cb: FileFilterCallback) => {
@@ -61,4 +63,11 @@ export const multiple = (field: string) => {
             next();
         });
     };
+};
+
+export const renameFile = (originalname: string, itemCode: string) => {
+    const ext = path.extname(originalname);
+    const randomNum = randomInt(100, 1000);
+    const newFileName = `${itemCode}-${randomNum}${ext}`;
+    return { fileName: newFileName };
 };

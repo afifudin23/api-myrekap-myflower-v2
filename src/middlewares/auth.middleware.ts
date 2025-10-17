@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import ErrorCode from "@/constants/error-code";
 import { env, prisma } from "@/config";
-import { UnauthorizedException } from "@/exceptions";
+import { BadRequestException, UnauthorizedException } from "@/exceptions";
 
 export type AppNameType = "myrekap" | "myflower";
 export interface AuthReq extends Request {
@@ -14,8 +14,10 @@ interface AccessTokenPayload extends JwtPayload {
 }
 
 const authMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
+    const appName = (req.headers["x-app-name"] as string)?.toLowerCase() as AppNameType;
+    if (!appName)
+        return next(new BadRequestException("Missing required header: x-app-name", ErrorCode.REQUIRED_APP_NAME));
     try {
-        const appName = (req.headers["x-app-name"] as string)?.toLowerCase() as AppNameType;
         const token = req.cookies[`token_${appName}`];
         const payload = jwt.verify(token, env.JWT_ACCESS) as AccessTokenPayload;
 
@@ -23,9 +25,7 @@ const authMiddleware = async (req: Request, _res: Response, next: NextFunction) 
         (req as AuthReq).user = user;
         next();
     } catch (_error) {
-        return next(
-            new UnauthorizedException("Your session has expired. Please log in again", ErrorCode.UNAUTHORIZED)
-        );
+        return next(new UnauthorizedException("Your session has expired. Please log in again", ErrorCode.UNAUTHORIZED));
     }
 };
 
