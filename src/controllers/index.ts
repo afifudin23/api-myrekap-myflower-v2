@@ -4,7 +4,7 @@ export * as productController from "@/controllers/product.controller";
 export * as userController from "@/controllers/user.controller";
 export * as cartItemController from "@/controllers/cart-item.controller";
 export * as ordersMyRekapController from "@/controllers/orders/myrekap.controller";
-export * as ordersCustomerController from "@/controllers/orders/customer.controller";
+export * as ordersMyFlowerController from "@/controllers/orders/myflower.controller";
 export * as transactionController from "@/controllers/transaction.controller";
 export * as reviewController from "@/controllers/review.controller";
 export * as reportController from "@/controllers/report.controller";

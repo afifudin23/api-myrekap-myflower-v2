@@ -1,5 +1,11 @@
 import ErrorCode from "@/constants/error-code";
-import { BadRequestException, InternalException, NotFoundException, UnprocessableUntityException } from "@/exceptions";
+import {
+    BadRequestException,
+    ForbiddenException,
+    InternalException,
+    NotFoundException,
+    UnprocessableUntityException,
+} from "@/exceptions";
 import { cloudinary, prisma, uploadFile } from "@/config";
 import { formatters, upload } from "@/utils";
 import { ordersMyRekapSchema } from "@/schemas";
@@ -306,6 +312,12 @@ export const updateStatus = async (
     // Check if order exists
     const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
     if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
+
+    if (order.source !== "MYREKAP")
+        throw new ForbiddenException(
+            "Forbidden: Order source is not from 'MYREKAP'",
+            ErrorCode.ORDER_SOURCE_NOT_MYREKAP
+        );
 
     if (order.deliveryOption !== "DELIVERY" && orderStatus === "DELIVERY")
         throw new BadRequestException(

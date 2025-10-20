@@ -1,6 +1,6 @@
 export * as authService from "@/services/auth.service";
 export * as ordersMyRekapService from "@/services/orders/myrekap.service";
-export * as ordersCustomerService from "@/services/orders/customer.service";
+export * as ordersMyFlowerService from "@/services/orders/myflower.service";
 export * as paymentProofService from "@/services/payment-proof.service";
 export * as productService from "@/services/product.service";
 export * as userService from "@/services/user.service";

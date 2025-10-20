@@ -1,7 +1,7 @@
 import authRouter from "@/routes/auth.route";
 import cartItemRouter from "@/routes/cart-item.route";
-import ordersMyRekapRouter from "@/routes/orders/admin.route";
-import ordersCustomerRouter from "@/routes/orders/customer.route";
+import ordersMyRekapRouter from "@/routes/orders/myrekap.route";
+import ordersMyFlowerRouter from "@/routes/orders/myflower.route";
 import paymentProofRouter from "@/routes/payment-proof.route";
 import productRouter from "@/routes/product.route";
 import reportRouter from "@/routes/report.route";
@@ -18,7 +18,7 @@ rootRouter.use("/products", productRouter);
 rootRouter.use("/products/:productId/reviews", reviewRouter);
 rootRouter.use("/carts", cartItemRouter);
 rootRouter.use("/orders/myrekap", ordersMyRekapRouter);
-rootRouter.use("/orders/customer", ordersCustomerRouter);
+rootRouter.use("/orders/myflower", ordersMyFlowerRouter);
 rootRouter.use("/payment-proofs", paymentProofRouter);
 rootRouter.use("/transactions", transactionRouter);
 rootRouter.use("/reports", reportRouter);

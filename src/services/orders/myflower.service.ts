@@ -1,10 +1,10 @@
 import { prisma } from "@/config";
 import ErrorCode from "@/constants/error-code";
 import { BadRequestException, InternalException, NotFoundException } from "@/exceptions";
-import { ordersCustomerSchema } from "@/schemas";
+import { ordersMyFlowerSchema } from "@/schemas";
 import { formatters } from "@/utils";
 
-export const create = async (user: any, data: ordersCustomerSchema.CreateType) => {
+export const create = async (user: any, data: ordersMyFlowerSchema.CreateType) => {
     const cartItems = await prisma.cartItem.findMany({ where: { userId: user.id }, include: { product: true } });
     if (cartItems.length === 0)
         throw new BadRequestException("Cart must contain at least one item", ErrorCode.ORDER_MUST_CONTAIN_ITEMS);
@@ -47,15 +47,17 @@ export const create = async (user: any, data: ordersCustomerSchema.CreateType) =
         });
         totalPrice += orderItemPrice;
     }
-    const shippingCost = data.deliveryOption === "DELIVERY" ? totalPrice * 0.1 : 0;
-    // const customerCategory = user.customerCategory ?? undefined;
+
+    const shippingCost = data.deliveryOption === "DELIVERY" ? totalPrice * 0 : 0;
     const paymentStatus = data.paymentMethod === "COD" ? "UNPAID" : undefined;
-    const { items, ...orderData } = data;
 
     transactionOps.push(
         prisma.order.create({
             data: {
-                ...orderData,
+                deliveryOption: data.deliveryOption,
+                deliveryAddress: data.deliveryAddress,
+                readyDate: data.readyDate,
+                paymentMethod: data.paymentMethod,
                 customerName: user.fullName,
                 phoneNumber: user.phoneNumber,
                 source: "MYFLOWER",
@@ -63,19 +65,21 @@ export const create = async (user: any, data: ordersCustomerSchema.CreateType) =
                 orderCode,
                 totalPrice,
                 shippingCost,
-                // customerCategory,
+                customerCategory: user.customerCategory ?? undefined,
                 paymentStatus,
                 items: { create: orderItems },
             },
-            include: { items: { include: { product: true } } },
+            select: {
+                id: true,
+                orderCode: true,
+            },
         })
     );
 
     try {
         const result = await prisma.$transaction(transactionOps);
-        const order = result.at(-1);
-
-        return order;
+        await prisma.cartItem.deleteMany({ where: { userId: user.id } });
+        return result.at(-1);
     } catch (error: any) {
         console.log(error.message);
         throw new InternalException("Failed to create order", ErrorCode.FAILED_TO_CREATE_ORDER, error);
@@ -84,7 +88,7 @@ export const create = async (user: any, data: ordersCustomerSchema.CreateType) =
 
 export const findAllByUser = async (userId: string) => {
     return await prisma.order.findMany({
-        where: { userId },
+        where: { userId, source: "MYFLOWER" },
         include: { items: { include: { product: { include: { images: true } } } } },
         orderBy: { orderDate: "desc" },
     });
@@ -168,9 +172,8 @@ export const cancel = async (id: string) => {
 };
 export const confirm = async (id: string) => {
     const order = await prisma.order.findUniqueOrThrow({ where: { id } });
-    if (order.orderStatus !== "IN_PROCESS") {
+    if (order.orderStatus !== "IN_PROCESS")
         throw new BadRequestException("Order status cannot be completed", ErrorCode.ORDER_NOT_IN_PROCESS);
-    }
 
     try {
         const data = await prisma.order.update({

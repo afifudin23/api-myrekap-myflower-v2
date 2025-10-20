@@ -42,7 +42,7 @@ app.get("/test-error", async (_req, _res, next) => {
     next(new InternalException("Something went wrong", ErrorCode.INTERNAL_EXCEPTION, null));
 });
 
-app.use("/api", rootRouter);
+app.use("/api/v2", rootRouter);
 
 app.use(errorMiddleware); // error handling middleware
 

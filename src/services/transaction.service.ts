@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { formatters } from "@/utils";
 import { InternalException, MidtransException, NotFoundException } from "@/exceptions";
 import ErrorCode from "@/constants/error-code";
-import { ordersCustomerService } from "@/services";
+import { ordersMyFlowerService } from "@/services";
 import { prisma } from "@/config";
 
 const snap = new midtransClient.Snap({
@@ -52,7 +52,7 @@ export const notification = async (data: any) => {
                     include: { user: true, items: { include: { product: true } } },
                 });
                 // await mailerService.sendCustomerOrderStatusEmail(updatedOrder.user, "create", updatedOrder);
-                await ordersCustomerService.notification(updatedOrder);
+                await ordersMyFlowerService.notification(updatedOrder);
                 await prisma.cartItem.deleteMany({ where: { userId: updatedOrder.userId } });
                 break;
             }
@@ -143,7 +143,6 @@ export const create = async (user: any, orderCode: string) => {
 
         return await snap.createTransaction(parameter);
     } catch (error: any) {
-        console.log(error);
         let errorParsed;
         const match = error.message.match(/API response:\s*(\{.*\})/i);
         if (match) {
