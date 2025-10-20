@@ -13,49 +13,43 @@ type UploadResultsType = {
 
 export const create = async (body: productSchema.CreateType, files: Express.Multer.File[]) => {
     const duplicateName = await prisma.product.findUnique({ where: { name: body.name }, select: { id: true } });
-    if (duplicateName) {
-        throw new BadRequestException("Product name already exists", ErrorCode.PRODUCT_NAME_DUPLICATE);
-    }
-    let uploadResults: UploadResultsType = [];
+    if (duplicateName) throw new BadRequestException("Product name already exists", ErrorCode.PRODUCT_NAME_DUPLICATE);
+
+    const uploadResults: UploadResultsType = [];
     try {
         const productCode = formatters.generateCode("product");
-        uploadResults = await Promise.all(
-            files.map(async (file) => {
-                const renamed = upload.renameFile(file.originalname, productCode);
-                const result = await uploadFile(
-                    file,
-                    `myrekap-v2/products/${body.name.toLowerCase().split(" ").join("-")}`,
-                    renamed.fileName
-                );
-                return {
-                    fileName: renamed.fileName,
-                    size: file.size,
-                    secureUrl: result.secure_url,
-                    publicId: result.public_id,
-                };
-            })
-        );
+        for (const file of files) {
+            const renamed = upload.renameFile(file.originalname, productCode);
+            const result = await uploadFile(
+                file,
+                `myrekap-v2/products/${body.name.toLowerCase().split(" ").join("-")}`,
+                renamed.fileName
+            );
+            uploadResults.push({
+                fileName: renamed.fileName,
+                size: file.size,
+                secureUrl: result.secure_url,
+                publicId: result.public_id,
+            });
+        }
         return await prisma.product.create({
             data: {
                 name: body.name,
                 price: body.price,
                 description: body.description,
+                isActive: body.isActive,
                 productCode,
                 images: { create: uploadResults.map((result) => result) },
             },
-            include: {
-                images: true,
-            },
+            select: { id: true },
         });
     } catch (error) {
         // Rollback upload images
-        await Promise.all(
-            uploadResults.map(async (result) => {
-                await cloudinary.uploader.destroy(result.publicId).catch((error) => {
-                    console.error("❌ Failed to delete image:", result.publicId, error);
-                });
-            })
-        );
+        for (const result of uploadResults) {
+            await cloudinary.uploader.destroy(result.publicId).catch((error) => {
+                console.error("❌ Failed to delete image:", result.publicId, error);
+            });
+        }
         throw new InternalException("Failed to create product", ErrorCode.PRODUCT_CREATE_FAILED, error);
     }
 };
@@ -84,39 +78,35 @@ export const update = async (id: string, body: productSchema.UpdateType, files: 
     if (existingProduct.isActive !== body.isActive && body.isActive === false)
         await prisma.cartItem.deleteMany({ where: { productId: id } });
 
-    let uploadResults: UploadResultsType = [];
+    const uploadResults: UploadResultsType = [];
     if (files && files.length > 0 && !body.name)
         throw new BadRequestException("Product name is required to upload image", ErrorCode.PRODUCT_NOT_FOUND);
     try {
         // Upload new files
         if (files && files.length > 0) {
-            uploadResults = await Promise.all(
-                files.map(async (file) => {
-                    const renamed = upload.renameFile(file.originalname, existingProduct.productCode);
-                    const result = await uploadFile(
-                        file,
-                        `myrekap-v2/products/${body.name?.toLowerCase().split(" ").join("-")}`,
-                        renamed.fileName
-                    );
-                    return {
-                        fileName: renamed.fileName,
-                        size: file.size,
-                        secureUrl: result.secure_url,
-                        publicId: result.public_id,
-                    };
-                })
-            );
+            for (const file of files) {
+                const renamed = upload.renameFile(file.originalname, existingProduct.productCode);
+                const result = await uploadFile(
+                    file,
+                    `myrekap-v2/products/${body.name?.toLowerCase().split(" ").join("-")}`,
+                    renamed.fileName
+                );
+                uploadResults.push({
+                    fileName: renamed.fileName,
+                    size: file.size,
+                    secureUrl: result.secure_url,
+                    publicId: result.public_id,
+                });
+            }
         }
 
         // Delete old files
         if (body.publicIdsToDelete) {
-            await Promise.all(
-                body.publicIdsToDelete.map(async (publicId: string) => {
-                    await cloudinary.uploader.destroy(publicId).catch((error) => {
-                        throw new Error(error);
-                    });
-                })
-            );
+            for (const publicId of body.publicIdsToDelete) {
+                await cloudinary.uploader.destroy(publicId).catch((error) => {
+                    throw new Error(error);
+                });
+            }
             await prisma.productImage.deleteMany({ where: { publicId: { in: body.publicIdsToDelete } } });
         }
 
@@ -130,17 +120,15 @@ export const update = async (id: string, body: productSchema.UpdateType, files: 
                 isActive: body.isActive,
                 images: { create: uploadResults.map((result) => result) },
             },
-            include: { images: true },
+            select: { id: true },
         });
     } catch (error) {
         // Rollback upload images
-        await Promise.all(
-            uploadResults.map(async (result) => {
-                await cloudinary.uploader.destroy(result.publicId).catch((error) => {
-                    console.error("❌ Failed to delete image:", result.publicId, error);
-                });
-            })
-        );
+        for (const result of uploadResults) {
+            await cloudinary.uploader.destroy(result.publicId).catch((error) => {
+                console.error("❌ Failed to delete image:", result.publicId, error);
+            });
+        }
         throw new InternalException("Failed to update product", ErrorCode.PRODUCT_UPDATE_FAILED, error);
     }
 };
@@ -154,7 +142,7 @@ export const remove = async (id: string) => {
                 });
             })
         );
-        return await prisma.product.delete({ where: { id }, include: { images: true } });
+        return await prisma.product.delete({ where: { id }, select: { id: true } });
     } catch (_error) {
         throw new NotFoundException("Product not found", ErrorCode.PRODUCT_NOT_FOUND);
     }
@@ -172,12 +160,12 @@ export const manageStock = async (id: string, userId: string, body: any) => {
     body.note =
         (body.note && body.note.trim()) ||
         (body.type === "STOCK_IN" ? `Stock in by admin #${user?.userCode}` : `Stock out by admin #${user?.userCode}`);
-    const transaction = await prisma.stockTransaction.create({
-        data: { productId: id, type: body.type, quantity: body.quantity, note: body.note },
-    });
     await prisma.product.update({
         where: { id },
         data: { stock: body.type === "STOCK_IN" ? { increment: body.quantity } : { decrement: body.quantity } },
+    });
+    const transaction = await prisma.stockTransaction.create({
+        data: { productId: id, type: body.type, quantity: body.quantity, note: body.note },
     });
 
     return transaction;

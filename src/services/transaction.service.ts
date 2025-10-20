@@ -60,7 +60,7 @@ export const notification = async (data: any) => {
                 await prisma.order.update({
                     where: { orderCode: orderCode },
                     data: {
-                        paymentStatus: "CANCELED",
+                        orderStatus: "CANCELED",
                     },
                 });
                 break;

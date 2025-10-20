@@ -29,7 +29,7 @@ export const login = async (body: any, appName: AppNameType) => {
     }
 
     // generate token
-    const token = jwt.sign({ id: user.id }, env.JWT_ACCESS, { expiresIn: "1d" });
+    const token = jwt.sign({ id: user.id, role: user.role }, env.JWT_ACCESS, { expiresIn: "1d" });
     return { data: { fullName: user.fullName, role: user.role }, token };
 };
 

@@ -4,9 +4,9 @@ import { cloudinary, prisma } from "@/config";
 
 export const deletePaymentProofByOrderSummaryId = async (orderId: string) => {
     try {
-        const paymentProof = await prisma.paymentProof.findUnique({ where: { orderId } });
+        const paymentProof = await prisma.orderImage.findUnique({ where: { orderId_type: { orderId, type: "PAYMENT_PROOF" } } });
         if (paymentProof) {
-            const data = await prisma.paymentProof.delete({ where: { orderId } });
+            const data = await prisma.orderImage.delete({ where: { orderId_type: { orderId, type: "PAYMENT_PROOF" } } });
             await cloudinary.uploader.destroy(data.publicId);
             return data;
         }

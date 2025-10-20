@@ -4,7 +4,7 @@ export const create = z
     .object({
         deliveryOption: z.preprocess(
             (val) => (typeof val === "string" ? val.toUpperCase() : val),
-            z.enum(["DELIVERY", "PICKUP"])
+            z.enum(["DELIVERY", "SELF_PICKUP"])
         ),
         deliveryAddress: z.string().nullish(),
         readyDate: z.coerce.date(),
@@ -21,7 +21,7 @@ export const create = z
     })
     .superRefine((data, ctx) => {
         // If delivery option is "PICKUP", set delivery address, date, and shipping cost to null
-        if (data.deliveryOption === "PICKUP") {
+        if (data.deliveryOption === "SELF_PICKUP") {
             data.deliveryAddress = null;
         }
 

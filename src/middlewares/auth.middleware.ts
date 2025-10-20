@@ -15,8 +15,13 @@ interface AccessTokenPayload extends JwtPayload {
 
 const authMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
     const appName = (req.headers["x-app-name"] as string)?.toLowerCase() as AppNameType;
-    if (!appName)
-        return next(new BadRequestException("Missing required header: x-app-name", ErrorCode.REQUIRED_APP_NAME));
+    if (!appName || !["myrekap", "myflower"].includes(appName))
+        return next(
+            new BadRequestException(
+                "Invalid or missing header: x-app-name. Allowed values are 'myrekap' or 'myflower'.",
+                ErrorCode.REQUIRED_APP_NAME
+            )
+        );
     try {
         const token = req.cookies[`token_${appName}`];
         const payload = jwt.verify(token, env.JWT_ACCESS) as AccessTokenPayload;

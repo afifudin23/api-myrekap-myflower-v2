@@ -104,7 +104,7 @@ export const createMonthlyStockReport = async (req: Request, res: Response, next
     const body = productSchema.createReport.parse(req.body);
     try {
         await productService.createReport(body);
-        res.json({ message: "Monthly stock report created successfully" });
+        res.json({ message: "Monthly stock report created successfully", data: body });
     } catch (error) {
         return next(error);
     }

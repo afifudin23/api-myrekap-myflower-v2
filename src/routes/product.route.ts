@@ -23,17 +23,17 @@ productRouter.post(
     upload.multiple("images"),
     errorHandler(productController.createProduct)
 );
-productRouter.post(
-    "/:id/stock",
-    [authMiddleware, requireMyRekapApp],
-    errorHandler(productController.manageProductStock)
-);
-productRouter.put(
+productRouter.patch(
     "/:id",
     [authMiddleware, requireMyRekapApp],
     upload.multiple("images"),
     errorHandler(productController.updateProduct)
 );
 productRouter.delete("/:id", [authMiddleware, requireMyRekapApp], errorHandler(productController.deleteProduct));
+productRouter.patch(
+    "/:id/stock",
+    [authMiddleware, requireMyRekapApp],
+    errorHandler(productController.manageProductStock)
+);
 
 export default productRouter;

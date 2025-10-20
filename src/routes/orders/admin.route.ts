@@ -1,29 +1,29 @@
-import { ordersAdminController } from "@/controllers";
-import { authMiddleware } from "@/middlewares";
+import { ordersMyRekapController } from "@/controllers";
+import { authMiddleware, requireMyRekapApp } from "@/middlewares";
 import { errorHandler, upload } from "@/utils";
 import { Router } from "express";
 
 const ordersAdminRouter: Router = Router();
 
-ordersAdminRouter.get("/", [authMiddleware], errorHandler(ordersAdminController.getAllOrders));
-ordersAdminRouter.get("/:id", [authMiddleware], errorHandler(ordersAdminController.getOrderById));
+ordersAdminRouter.get("/", [authMiddleware, requireMyRekapApp], errorHandler(ordersMyRekapController.getAllOrders));
+ordersAdminRouter.get("/:id", [authMiddleware, requireMyRekapApp], errorHandler(ordersMyRekapController.getOrderById));
 ordersAdminRouter.post(
     "/",
-    [authMiddleware],
+    [authMiddleware, requireMyRekapApp],
     upload.single("paymentProof"),
-    errorHandler(ordersAdminController.createOrder)
-);
-ordersAdminRouter.put(
-    "/:id/edit",
-    [authMiddleware],
-    upload.single("paymentProof"),
-    errorHandler(ordersAdminController.updateOrder)
+    errorHandler(ordersMyRekapController.createOrder)
 );
 ordersAdminRouter.patch(
-    "/:orderId/update-progress",
-    [authMiddleware],
+    "/:id",
+    [authMiddleware, requireMyRekapApp],
+    upload.single("paymentProof"),
+    errorHandler(ordersMyRekapController.updateOrder)
+);
+ordersAdminRouter.patch(
+    "/:id/status",
+    [authMiddleware, requireMyRekapApp],
     upload.single("finishedProduct"),
-    errorHandler(ordersAdminController.updateOrderProgress)
+    errorHandler(ordersMyRekapController.updateOrderStatus)
 );
 
 export default ordersAdminRouter;

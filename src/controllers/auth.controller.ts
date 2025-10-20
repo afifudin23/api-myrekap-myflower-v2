@@ -7,7 +7,12 @@ import { AppNameType } from "@/middlewares";
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     const appName = (req.headers["x-app-name"] as string)?.toLowerCase() as AppNameType;
-    if (!appName) throw new BadRequestException("Missing required header: x-app-name", ErrorCode.REQUIRED_APP_NAME);
+    if (!appName || !["myrekap", "myflower"].includes(appName))
+        throw new BadRequestException(
+            "Invalid or missing header: x-app-name. Allowed values are 'myrekap' or 'myflower'.",
+            ErrorCode.REQUIRED_APP_NAME
+        );
+
     const body = authSchema.login.parse(req.body);
     try {
         const data = await authService.login(body, appName);
@@ -20,7 +25,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             maxAge: 60 * 60 * 24 * 1000,
             path: "/", // Hanya untuk path ini
         });
-        res.status(200).json({ message: "Login successfully", data: data.data });
+        res.status(200).json({ message: "Login successfully", data: { appName, ...data.data } });
     } catch (error) {
         return next(error);
     }

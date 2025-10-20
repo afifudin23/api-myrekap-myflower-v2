@@ -21,10 +21,10 @@ export const create = z
 export type CreateType = TypeOf<typeof create>;
 
 export const update = object({
-    fullName: string().optional(),
-    username: string().optional(),
-    email: string().email().optional(),
-    phoneNumber: string().optional(),
+    fullName: string(),
+    username: string(),
+    email: string().email(),
+    phoneNumber: string(),
     password: string().nullish().optional(),
     confPassword: string().nullish().optional(),
 }).superRefine((data, ctx) => {
@@ -55,18 +55,16 @@ export const update = object({
 export type UpdateType = TypeOf<typeof update>;
 
 export const updateProfile = object({
-    fullName: string().optional(),
-    username: string().optional(),
-    email: string().email().optional(),
-    phoneNumber: string().optional(),
+    fullName: string(),
+    username: string(),
+    email: string().email(),
+    phoneNumber: string(),
     customerCategory: z.preprocess(
         (value) => (typeof value === "string" ? value.toUpperCase() : value),
-        z
-            .enum(["UMUM", "PEMDA", "PERBANKAN"], {
-                required_error: "Customer category is required",
-                invalid_type_error: "Customer category must be a valid enum value",
-            })
-            .nullish()
+        z.enum(["UMUM", "PEMDA", "PERBANKAN"], {
+            required_error: "Customer category is required",
+            invalid_type_error: "Customer category must be a valid enum value",
+        })
     ),
     oldPassword: string().optional(),
     newPassword: string().optional(),

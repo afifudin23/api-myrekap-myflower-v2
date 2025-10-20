@@ -90,7 +90,7 @@ model StockTransaction {
   note      String    @map("note")
   createdAt DateTime  @default(now()) @map("created_at")
 
-  product Product @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("stock_transactions")
 }
@@ -112,6 +112,8 @@ model MonthlyStockReport {
   createdAt    DateTime @default(now()) @map("created_at")
 
   product Product @relation(fields: [productId], references: [id])
+
+  @@map("monthly_stock_reports")
 }
 
 model ProductImage {
@@ -164,15 +166,13 @@ model Order {
 
   // Status
   paymentStatus         PaymentStatus  @default(PENDING) @map("payment_status")
-  previousPaymentStatus PaymentStatus? @map("previous_payment_status")
   orderStatus           OrderStatus    @default(IN_PROCESS) @map("order_status")
   orderDate             DateTime       @default(now()) @map("order_date")
 
   // Relation
-  paymentProof    PaymentProof?
-  finishedProduct FinishedProduct?
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items           OrderItem[]
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images OrderImage[]
+  items  OrderItem[]
 
   @@map("orders")
 }
@@ -192,30 +192,24 @@ model OrderItem {
   @@map("order_items")
 }
 
-model PaymentProof {
-  id        String @id @default(cuid())
-  fileName  String @map("file_name")
-  size      Int    @map("size")
-  publicId  String @map("public_id")
-  secureUrl String @map("secure_url")
-  orderId   String @unique @map("order_id")
+model OrderImage {
+  id        String         @id @default(cuid())
+  orderId   String         @map("order_id")
+  type      OrderImageType @map("type")
+  fileName  String         @map("file_name")
+  size      Int            @map("size")
+  publicId  String         @map("public_id")
+  secureUrl String         @map("secure_url")
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  @@map("payment_proofs")
+  @@unique([orderId, type])
+  @@map("order_images")
 }
 
-model FinishedProduct {
-  id        String @id @default(cuid())
-  fileName  String @map("file_name")
-  size      Int    @map("size")
-  publicId  String @map("public_id")
-  secureUrl String @map("secure_url")
-  orderId   String @unique @map("order_id")
-
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  @@map("finished_products")
+enum OrderImageType {
+  PAYMENT_PROOF    @map("payment_proof")
+  FINISHED_PRODUCT @map("finished_product")
 }
 
 model Review {
@@ -238,16 +232,13 @@ enum Source {
 }
 
 enum DeliveryOption {
-  DELIVERY @map("delivery")
-  PICKUP   @map("pickup")
+  DELIVERY    @map("delivery")
+  SELF_PICKUP @map("self_pickup")
 }
 
 enum CustomerCategory {
   UMUM           @map("umum")
   PEMDA          @map("pemda")
-  AKADEMIK       @map("akademik")
-  RUMAH_SAKIT    @map("rumah_sakit")
-  POLISI_MILITER @map("polisi_militer")
   PERBANKAN      @map("perbankan")
 }
 
@@ -272,7 +263,6 @@ enum PaymentStatus {
   PENDING  @map("pending")
   UNPAID   @map("unpaid")
   PAID     @map("paid")
-  CANCELED @map("canceled")
   EXPIRED  @map("expired")
   REFUNDED @map("refunded")
   DENIED   @map("denied")

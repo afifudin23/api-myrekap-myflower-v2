@@ -4,24 +4,16 @@ export const create = z.object({
     name: z.string().transform((val) => val.trim()),
     price: z.coerce.number({ invalid_type_error: "Price must be a number" }).min(1, "Price must be greater than 0"),
     description: z.string().transform((val) => val.trim()),
+    isActive: z.coerce.boolean(),
 });
 
 export type CreateType = z.infer<typeof create>;
 
 export const update = z.object({
-    name: z
-        .string()
-        .transform((val) => val.trim())
-        .optional(),
-    price: z.coerce
-        .number({ invalid_type_error: "Price must be a number" })
-        .min(1, "Price must be greater than 0")
-        .optional(),
-    description: z
-        .string()
-        .transform((val) => val.trim())
-        .optional(),
-    isActive: z.coerce.boolean().optional(),
+    name: z.string().transform((val) => val.trim()),
+    price: z.coerce.number({ invalid_type_error: "Price must be a number" }).min(1, "Price must be greater than 0"),
+    description: z.string().transform((val) => val.trim()),
+    isActive: z.coerce.boolean(),
     publicIdsToDelete: z.array(z.string()).optional(),
 });
 export type UpdateType = z.infer<typeof update>;

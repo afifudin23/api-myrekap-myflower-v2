@@ -155,7 +155,7 @@ export const cancel = async (id: string) => {
         prisma.order.update({
             where: { id },
             include: { items: { include: { product: { include: { images: true } } } } },
-            data: { orderStatus: "CANCELED", paymentStatus: "CANCELED" },
+            data: { orderStatus: "CANCELED" },
         })
     );
 

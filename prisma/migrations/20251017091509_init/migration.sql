@@ -142,22 +142,10 @@ CREATE TABLE `payment_proofs` (
     `size` INTEGER NOT NULL,
     `public_id` VARCHAR(191) NOT NULL,
     `secure_url` VARCHAR(191) NOT NULL,
+    `type` ENUM('payment_proof', 'finished_product') NOT NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `payment_proofs_order_id_key`(`order_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `finished_products` (
-    `id` VARCHAR(191) NOT NULL,
-    `file_name` VARCHAR(191) NOT NULL,
-    `size` INTEGER NOT NULL,
-    `public_id` VARCHAR(191) NOT NULL,
-    `secure_url` VARCHAR(191) NOT NULL,
-    `order_id` VARCHAR(191) NOT NULL,
-
-    UNIQUE INDEX `finished_products_order_id_key`(`order_id`),
+    UNIQUE INDEX `payment_proofs_order_id_type_key`(`order_id`, `type`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -202,9 +190,6 @@ ALTER TABLE `order_items` ADD CONSTRAINT `order_items_order_id_fkey` FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE `payment_proofs` ADD CONSTRAINT `payment_proofs_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `finished_products` ADD CONSTRAINT `finished_products_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `reviews` ADD CONSTRAINT `reviews_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
