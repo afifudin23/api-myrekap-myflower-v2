@@ -192,17 +192,8 @@ export const getReport = async (month: number, year: number, type: any) => {
 };
 const sumStock = async (productId: string, type: "STOCK_IN" | "STOCK_OUT", month: number, year: number) => {
     const stockRecords = await prisma.stockTransaction.aggregate({
-        _sum: {
-            quantity: true,
-        },
-        where: {
-            productId,
-            type,
-            createdAt: {
-                gte: new Date(year, month - 1, 1),
-                lte: new Date(year, month, 0),
-            },
-        },
+        _sum: { quantity: true },
+        where: { productId, type, createdAt: { gte: new Date(year, month - 1, 1), lte: new Date(year, month, 0) } },
     });
     return stockRecords._sum.quantity || 0;
 };
@@ -225,24 +216,24 @@ export const createReport = async (body: { month: number; year: number }) => {
         });
         const stockIn = await sumStock(product.id, "STOCK_IN", body.month, body.year);
         const stockOut = await sumStock(product.id, "STOCK_OUT", body.month, body.year);
+        const initialStock = lastReport ? lastReport.finalStock : 0;
 
         reportData.push({
             productId: product.id,
             month: body.month,
             year: body.year,
-            initialStock: lastReport ? lastReport.finalStock : 0,
+            initialStock,
             stockIn,
             stockOut,
-            finalStock: product.stock + stockIn - stockOut,
+            finalStock: initialStock + stockIn - stockOut,
         });
     }
 
     for (const data of reportData) {
-        const existing = await prisma.monthlyStockReport.findFirst({
-            where: { productId: data.productId, month: data.month, year: data.year },
+        await prisma.monthlyStockReport.upsert({
+            where: { productId_month_year: { productId: data.productId, month: data.month, year: data.year } },
+            update: data,
+            create: data,
         });
-
-        if (existing) await prisma.monthlyStockReport.update({ where: { id: existing.id }, data });
-        else await prisma.monthlyStockReport.create({ data });
     }
 };

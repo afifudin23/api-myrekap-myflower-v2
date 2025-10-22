@@ -31,7 +31,7 @@ export const create = async (body: userSchema.CreateType) => {
 
     // hash password and create user
     const hashPassword = await argon2.hash(body.password);
-    const user = await prisma.user.create({
+    return await prisma.user.create({
         data: {
             userCode: formatters.generateCode("user"),
             fullName: body.fullName,
@@ -41,10 +41,8 @@ export const create = async (body: userSchema.CreateType) => {
             password: hashPassword,
             role: "ADMIN",
         },
+        select: { id: true },
     });
-
-    const { password, ...data } = user;
-    return data;
 };
 
 export const update = async (id: string, body: userSchema.UpdateType) => {
@@ -65,8 +63,7 @@ export const update = async (id: string, body: userSchema.UpdateType) => {
 
     if (body.password) {
         const hashPassword = await argon2.hash(body.password);
-        body.password = hashPassword;
-        const user = await prisma.user.update({
+        return await prisma.user.update({
             where: { id },
             data: {
                 fullName,
@@ -75,11 +72,10 @@ export const update = async (id: string, body: userSchema.UpdateType) => {
                 phoneNumber,
                 password: hashPassword,
             },
+            select: { id: true },
         });
-        const { password, ...data } = user;
-        return data;
     }
-    const user = await prisma.user.update({
+    return await prisma.user.update({
         where: { id },
         data: {
             fullName,
@@ -87,8 +83,8 @@ export const update = async (id: string, body: userSchema.UpdateType) => {
             email,
             phoneNumber,
         },
+        select: { id: true },
     });
-    return user;
 };
 
 export const updateProfile = async (userId: string, body: userSchema.UpdateProfileType) => {
@@ -97,7 +93,7 @@ export const updateProfile = async (userId: string, body: userSchema.UpdateProfi
     if (!user) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
 
     // check if update profile with change password
-    const { oldPassword, newPassword, confPassword, ...bodyWithoutPassword } = body;
+    const { oldPassword, newPassword, confPassword } = body;
     if (oldPassword && newPassword && confPassword) {
         // check if the password is correct
         const isPasswordValid = await argon2.verify(user.password, oldPassword!);
@@ -105,7 +101,7 @@ export const updateProfile = async (userId: string, body: userSchema.UpdateProfi
 
         const hashPassword = await argon2.hash(newPassword!);
         try {
-            const updatedUser = await prisma.user.update({
+            return await prisma.user.update({
                 where: { id: userId },
                 data: {
                     fullName: body.fullName,
@@ -114,41 +110,33 @@ export const updateProfile = async (userId: string, body: userSchema.UpdateProfi
                     phoneNumber: body.phoneNumber,
                     password: hashPassword,
                 },
+                select: { id: true },
             });
-            const { password, ...data } = updatedUser;
-            return data;
         } catch (error) {
             throw new InternalException("Update profile failed", ErrorCode.INTERNAL_EXCEPTION, error);
         }
     }
 
     try {
-        const userUpdated = await prisma.user.update({
+        return await prisma.user.update({
             where: { id: userId },
-            data: bodyWithoutPassword,
+            data: {
+                fullName: body.fullName,
+                username: body.username,
+                email: body.email,
+                phoneNumber: body.phoneNumber,
+            },
+            select: { id: true },
         });
-        const { password, ...data } = userUpdated;
-        return data;
     } catch (error) {
         throw new InternalException("Update profile failed", ErrorCode.INTERNAL_EXCEPTION, error);
     }
 };
 
 export const remove = async (id: string) => {
-    // check if the user exists
-    const findUser = await prisma.user.findFirst({
-        where: {
-            id,
-        },
-    });
-    if (!findUser) {
+    try {
+        return await prisma.user.delete({ where: { id }, select: { id: true } });
+    } catch (_error) {
         throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
     }
-    const user = await prisma.user.delete({
-        where: {
-            id,
-        },
-    });
-    const { password, ...data } = user;
-    return data;
 };

@@ -56,14 +56,7 @@ export const confirmOrder = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
-export const notification = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        await ordersMyFlowerService.notification(req.body);
-        res.status(200).send("OK");
-    } catch (error) {
-        next(error);
-    }
-};
+
 
 // FIX IT
 export const mailer = async (_req: Request, res: Response, next: NextFunction) => {

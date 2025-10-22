@@ -13,35 +13,23 @@ export const findAll = async (userId: string) => {
 };
 export const upsertItem = async (userId: string, data: cartItemSchema.AddToCartType) => {
     const product = await prisma.product.findUnique({ where: { id: data.productId } });
+    if (!product) throw new NotFoundException("Product not found", ErrorCode.PRODUCT_NOT_FOUND);
+
     if (product?.isActive === false)
         throw new BadRequestException("Product is not active", ErrorCode.PRODUCT_NOT_ACTIVE);
 
-    const existingItem = await prisma.cartItem.findFirst({
-        where: { userId, productId: data.productId },
+    const result = await prisma.cartItem.upsert({
+        where: { userId_productId: { userId, productId: data.productId } },
+        update: { quantity: { increment: 1 } },
+        create: { productId: data.productId, userId, quantity: 1 },
     });
-    if (existingItem) {
-        return {
-            data: await prisma.cartItem.update({
-                where: { id: existingItem.id },
-                data: { quantity: { increment: 1 } },
-            }),
-            isNew: false,
-        };
-    }
-    try {
-        return {
-            data: await prisma.cartItem.create({ data: { productId: data.productId, userId, quantity: 1 } }),
-            isNew: true,
-        };
-    } catch (_error) {
-        throw new NotFoundException("Product not found", ErrorCode.PRODUCT_NOT_FOUND);
-    }
+    return { data: result, isNew: result.quantity === 1 };
 };
 
 export const updateQuantity = async (userId: string, productId: string, action: "increment" | "decrement") => {
     try {
         const item = await prisma.cartItem.findUniqueOrThrow({ where: { userId_productId: { userId, productId } } });
-        if (item.quantity <= 1 && action === "decrement") {
+        if (item.quantity === 1 && action === "decrement") {
             return {
                 data: await prisma.cartItem.delete({ where: { id: item.id } }),
                 updated: false,
@@ -55,7 +43,7 @@ export const updateQuantity = async (userId: string, productId: string, action: 
             updated: true,
         };
     } catch (_error) {
-        throw new NotFoundException("Cart item not found", ErrorCode.CART_ITEM_NOT_FOUND);
+        throw new NotFoundException("Product not found", ErrorCode.CART_ITEM_NOT_FOUND);
     }
 };
 

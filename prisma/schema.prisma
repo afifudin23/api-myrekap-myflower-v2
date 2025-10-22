@@ -113,6 +113,7 @@ model MonthlyStockReport {
 
   product Product @relation(fields: [productId], references: [id])
 
+  @@unique([productId, month, year])
   @@map("monthly_stock_reports")
 }
 
@@ -165,9 +166,9 @@ model Order {
   paymentProvider String?        @map("payment_provider")
 
   // Status
-  paymentStatus         PaymentStatus  @default(PENDING) @map("payment_status")
-  orderStatus           OrderStatus    @default(IN_PROCESS) @map("order_status")
-  orderDate             DateTime       @default(now()) @map("order_date")
+  paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+  orderStatus   OrderStatus   @default(IN_PROCESS) @map("order_status")
+  orderDate     DateTime      @default(now()) @map("order_date")
 
   // Relation
   user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -237,9 +238,9 @@ enum DeliveryOption {
 }
 
 enum CustomerCategory {
-  UMUM           @map("umum")
-  PEMDA          @map("pemda")
-  PERBANKAN      @map("perbankan")
+  UMUM      @map("umum")
+  PEMDA     @map("pemda")
+  PERBANKAN @map("perbankan")
 }
 
 enum PaymentMethod {

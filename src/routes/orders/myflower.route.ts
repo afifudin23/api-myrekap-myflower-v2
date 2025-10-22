@@ -11,7 +11,6 @@ ordersCustomerRouter.post("/", [authMiddleware], errorHandler(ordersMyFlowerCont
 ordersCustomerRouter.patch("/:id/cancel", [authMiddleware], errorHandler(ordersMyFlowerController.cancelOrder));
 ordersCustomerRouter.patch("/:id/confirm", [authMiddleware], errorHandler(ordersMyFlowerController.confirmOrder));
 ordersCustomerRouter.delete("/:orderCode", [authMiddleware], errorHandler(ordersMyFlowerController.deleteOrder));
-ordersCustomerRouter.post("/notification", [authMiddleware], errorHandler(ordersMyFlowerController.notification));
 ordersCustomerRouter.post("/mailer/:method", [authMiddleware], errorHandler(ordersMyFlowerController.mailer));
 
 export default ordersCustomerRouter;

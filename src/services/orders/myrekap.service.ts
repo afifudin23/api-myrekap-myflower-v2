@@ -248,10 +248,10 @@ export const update = async (id: string, body: ordersMyRekapSchema.UpdateType, f
     }
 
     try {
-        // if (!body.isPaid && existingOrder.images.length === 1) {
-        //     await cloudinary.uploader.destroy(existingOrder.images[0].publicId);
-        //     transactionOps.push(prisma.orderImage.delete({ where: { id: existingOrder.images[0].id } }));
-        // }
+        if (!body.isPaid && existingOrder.images.length === 1) {
+            await cloudinary.uploader.destroy(existingOrder.images[0].publicId);
+            transactionOps.push(prisma.orderImage.delete({ where: { id: existingOrder.images[0].id } }));
+        }
         if (file?.buffer) {
             if (existingOrder.images.length > 0) {
                 await cloudinary.uploader.destroy(existingOrder.images[0].publicId);
@@ -383,7 +383,6 @@ export const updateStatus = async (
         user
     ) {
         if (orderStatus === "COMPLETED") dataOrderStatus.paymentStatus = "PAID";
-
         // Create STOCK_OUT history for reactivation
         for (const item of order.items) {
             transactionOps.push(
@@ -402,7 +401,6 @@ export const updateStatus = async (
             );
         }
     }
-
     transactionOps.push(prisma.order.update({ where: { id: orderId }, data: dataOrderStatus, select: { id: true } }));
 
     // Update order

@@ -106,10 +106,10 @@ export const findByIdAndUser = async (userId: string, orderId: string) => {
 export const remove = async (orderCode: string) => {
     const order = await prisma.order.findFirst({ where: { orderCode }, include: { items: true } });
     if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
-    const operations = [];
+    const transactionOps = [];
 
     for (const item of order.items) {
-        operations.push(
+        transactionOps.push(
             prisma.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } })
         );
 
@@ -122,12 +122,12 @@ export const remove = async (orderCode: string) => {
             orderBy: { createdAt: "desc" },
         });
 
-        if (latestHistory) operations.push(prisma.stockTransaction.delete({ where: { id: latestHistory.id } }));
+        if (latestHistory) transactionOps.push(prisma.stockTransaction.delete({ where: { id: latestHistory.id } }));
     }
-    operations.push(prisma.order.delete({ where: { orderCode } }));
+    transactionOps.push(prisma.order.delete({ where: { orderCode } }));
 
     try {
-        const result = await prisma.$transaction(operations);
+        const result = await prisma.$transaction(transactionOps);
         return result.at(-1);
     } catch (_error) {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
@@ -139,10 +139,10 @@ export const cancel = async (id: string) => {
     if (order.orderStatus !== "IN_PROCESS")
         throw new BadRequestException("Order status cannot be canceled", ErrorCode.ORDER_NOT_IN_PROCESS);
 
-    const operations = [];
+    const transactionOps = [];
 
     for (const item of order.items) {
-        operations.push(
+        transactionOps.push(
             prisma.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } }),
             prisma.stockTransaction.create({
                 data: {
@@ -155,17 +155,16 @@ export const cancel = async (id: string) => {
         );
     }
 
-    operations.push(
+    transactionOps.push(
         prisma.order.update({
             where: { id },
-            include: { items: { include: { product: { include: { images: true } } } } },
             data: { orderStatus: "CANCELED" },
+            select: { id: true },
         })
     );
 
     try {
-        const result = await prisma.$transaction(operations);
-        return result.at(-1);
+        return (await prisma.$transaction(transactionOps)).at(-1);
     } catch (_error) {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
     }
@@ -176,20 +175,12 @@ export const confirm = async (id: string) => {
         throw new BadRequestException("Order status cannot be completed", ErrorCode.ORDER_NOT_IN_PROCESS);
 
     try {
-        const data = await prisma.order.update({
+        return await prisma.order.update({
             where: { id },
-            include: { items: { include: { product: { include: { images: true } } } } },
             data: { orderStatus: "COMPLETED", paymentStatus: "PAID" },
+            select: { id: true },
         });
-        return data;
     } catch (_error) {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
     }
-};
-
-export const notification = async (order: any) => {
-    // Send Notification to WhatsApp
-    // const message = generatedTextLink(order);
-    // enqueueWhatsAppMessage(message);
-    console.log(order);
 };
