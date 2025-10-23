@@ -51,7 +51,6 @@ export const notification = async (data: any) => {
                     },
                     include: { user: true, items: { include: { product: true } } },
                 });
-                // FIX IT
                 await mailerService.sendMyFlowerOrderStatusEmail(order.id, "create");
                 await mailerService.sendNewOrderNotificationToManager(order.id);
                 break;

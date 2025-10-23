@@ -56,35 +56,38 @@ export const create = async (
     const shippingCost = data.deliveryOption === "DELIVERY" ? totalPrice * 0 : 0;
     const paymentStatus = data.paymentMethod === "COD" ? "UNPAID" : undefined;
 
-    transactionOps.push(
-        prisma.order.create({
-            data: {
-                deliveryOption: data.deliveryOption,
-                deliveryAddress: data.deliveryAddress,
-                readyDate: data.readyDate,
-                paymentMethod: data.paymentMethod,
-                customerName: user.fullName,
-                phoneNumber: user.phoneNumber,
-                source: "MYFLOWER",
-                userId: user.id,
-                orderCode,
-                totalPrice,
-                shippingCost,
-                customerCategory: user.customerCategory,
-                paymentStatus,
-                items: { create: orderItems },
-            },
-            select: {
-                id: true,
-                orderCode: true,
-            },
-        })
-    );
-
     try {
-        const result = await prisma.$transaction(transactionOps);
+        transactionOps.push(
+            prisma.order.create({
+                data: {
+                    deliveryOption: data.deliveryOption,
+                    deliveryAddress: data.deliveryAddress,
+                    readyDate: data.readyDate,
+                    paymentMethod: data.paymentMethod,
+                    customerName: user.fullName,
+                    phoneNumber: user.phoneNumber,
+                    source: "MYFLOWER",
+                    userId: user.id,
+                    orderCode,
+                    totalPrice,
+                    shippingCost,
+                    customerCategory: user.customerCategory,
+                    paymentStatus,
+                    items: { create: orderItems },
+                },
+                select: {
+                    id: true,
+                    orderCode: true,
+                },
+            })
+        );
+        const result = (await prisma.$transaction(transactionOps)).at(-1)!;
         await prisma.cartItem.deleteMany({ where: { userId: user.id } });
-        return result.at(-1);
+        if (data.paymentMethod === "COD") {
+            await mailerService.sendMyFlowerOrderStatusEmail(result.id, "create");
+            await mailerService.sendNewOrderNotificationToManager(result.id);
+        }
+        return result;
     } catch (error) {
         throw new InternalException("Failed to create order", ErrorCode.FAILED_TO_CREATE_ORDER, error);
     }
@@ -148,7 +151,6 @@ export const updateStatus = async (id: string, status: "cancel" | "confirm") => 
     }
 
     try {
-        // FIX IT
         await mailerService.sendMyFlowerOrderStatusEmail(id, status);
         return (await prisma.$transaction(transactionOps)).at(-1);
     } catch (_error) {

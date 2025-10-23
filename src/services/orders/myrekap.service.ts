@@ -79,7 +79,7 @@ export const create = async (userId: string, body: ordersMyRekapSchema.CreateTyp
     const products = await prisma.product.findMany();
     const productMap = new Map(products.map((product) => [product.id, product]));
     const orderItems = [];
-    const transactionOps: any[] = [];
+    const transactionOps = [];
     const orderCode = formatters.generateCode("order");
 
     for (const item of body.items) {
@@ -157,8 +157,7 @@ export const create = async (userId: string, body: ordersMyRekapSchema.CreateTyp
                 select: { id: true },
             })
         );
-        const result = (await prisma.$transaction(transactionOps)).at(-1);
-        // FIX IT
+        const result = (await prisma.$transaction(transactionOps)).at(-1)!;
         await mailerService.sendNewOrderNotificationToManager(result.id);
         return result;
     } catch (error) {
@@ -186,7 +185,7 @@ export const update = async (id: string, body: ordersMyRekapSchema.UpdateType, f
     const oldItems = existingOrder.items;
     const newItems = body.items;
     const products = await prisma.product.findMany();
-    const transactionOps: any[] = [];
+    const transactionOps = [];
 
     transactionOps.push(prisma.orderItem.deleteMany({ where: { orderId: id } }));
 
@@ -411,7 +410,6 @@ export const updateStatus = async (
     // Update order
     try {
         const result = await prisma.$transaction(transactionOps);
-        // FIX IT
         if (order.source === "MYFLOWER" && ["IN_PROCESS", "DELIVERY"].includes(orderStatus))
             mailerService.sendMyRekapOrderStatusEmail(orderId);
         return result.at(-1);
