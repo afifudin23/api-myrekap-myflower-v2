@@ -2,9 +2,14 @@ import { prisma } from "@/config";
 import ErrorCode from "@/constants/error-code";
 import { BadRequestException, InternalException, NotFoundException } from "@/exceptions";
 import { ordersMyFlowerSchema } from "@/schemas";
+import { mailerService } from "@/services";
 import { formatters } from "@/utils";
+import { CustomerCategory } from "@prisma/client";
 
-export const create = async (user: any, data: ordersMyFlowerSchema.CreateType) => {
+export const create = async (
+    user: { id: string; fullName: string; phoneNumber: string; customerCategory: CustomerCategory | null },
+    data: ordersMyFlowerSchema.CreateType
+) => {
     const cartItems = await prisma.cartItem.findMany({ where: { userId: user.id }, include: { product: true } });
     if (cartItems.length === 0)
         throw new BadRequestException("Cart must contain at least one item", ErrorCode.ORDER_MUST_CONTAIN_ITEMS);
@@ -65,7 +70,7 @@ export const create = async (user: any, data: ordersMyFlowerSchema.CreateType) =
                 orderCode,
                 totalPrice,
                 shippingCost,
-                customerCategory: user.customerCategory ?? undefined,
+                customerCategory: user.customerCategory,
                 paymentStatus,
                 items: { create: orderItems },
             },
@@ -80,8 +85,7 @@ export const create = async (user: any, data: ordersMyFlowerSchema.CreateType) =
         const result = await prisma.$transaction(transactionOps);
         await prisma.cartItem.deleteMany({ where: { userId: user.id } });
         return result.at(-1);
-    } catch (error: any) {
-        console.log(error.message);
+    } catch (error) {
         throw new InternalException("Failed to create order", ErrorCode.FAILED_TO_CREATE_ORDER, error);
     }
 };
@@ -103,83 +107,50 @@ export const findByIdAndUser = async (userId: string, orderId: string) => {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
     }
 };
-export const remove = async (orderCode: string) => {
-    const order = await prisma.order.findFirst({ where: { orderCode }, include: { items: true } });
-    if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
-    const transactionOps = [];
-
-    for (const item of order.items) {
-        transactionOps.push(
-            prisma.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } })
-        );
-
-        // Hapus stockTransaction terakhir (terkait item ini)
-        const latestHistory = await prisma.stockTransaction.findFirst({
-            where: {
-                productId: item.productId,
-                note: { contains: orderCode },
-            },
-            orderBy: { createdAt: "desc" },
-        });
-
-        if (latestHistory) transactionOps.push(prisma.stockTransaction.delete({ where: { id: latestHistory.id } }));
-    }
-    transactionOps.push(prisma.order.delete({ where: { orderCode } }));
-
-    try {
-        const result = await prisma.$transaction(transactionOps);
-        return result.at(-1);
-    } catch (_error) {
-        throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
-    }
-};
-export const cancel = async (id: string) => {
+export const updateStatus = async (id: string, status: "cancel" | "confirm") => {
     const order = await prisma.order.findFirst({ where: { id }, include: { items: true } });
     if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
-    if (order.orderStatus !== "IN_PROCESS")
-        throw new BadRequestException("Order status cannot be canceled", ErrorCode.ORDER_NOT_IN_PROCESS);
+    if (!["IN_PROCESS", "DELIVERY"].includes(order.orderStatus))
+        throw new BadRequestException("Order status cannot be updated", ErrorCode.ORDER_NOT_IN_PROCESS);
 
     const transactionOps = [];
 
-    for (const item of order.items) {
+    if (status === "cancel") {
+        for (const item of order.items) {
+            transactionOps.push(
+                prisma.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } }),
+                prisma.stockTransaction.create({
+                    data: {
+                        type: "STOCK_IN",
+                        quantity: item.quantity,
+                        productId: item.productId,
+                        note: `Order #${order.orderCode} canceled by customer #${order.userId}`,
+                    },
+                })
+            );
+        }
+
         transactionOps.push(
-            prisma.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } }),
-            prisma.stockTransaction.create({
-                data: {
-                    type: "STOCK_IN",
-                    quantity: item.quantity,
-                    productId: item.productId,
-                    note: `Order #${order.orderCode} canceled by customer #${order.userId}`,
-                },
+            prisma.order.update({
+                where: { id },
+                data: { orderStatus: "CANCELED" },
+                select: { id: true },
+            })
+        );
+    } else if (status === "confirm") {
+        transactionOps.push(
+            prisma.order.update({
+                where: { id },
+                data: { orderStatus: "COMPLETED", paymentStatus: "PAID" },
+                select: { id: true },
             })
         );
     }
 
-    transactionOps.push(
-        prisma.order.update({
-            where: { id },
-            data: { orderStatus: "CANCELED" },
-            select: { id: true },
-        })
-    );
-
     try {
+        // FIX IT
+        await mailerService.sendMyFlowerOrderStatusEmail(id, status);
         return (await prisma.$transaction(transactionOps)).at(-1);
-    } catch (_error) {
-        throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
-    }
-};
-export const confirm = async (id: string) => {
-    const order = await prisma.order.findUniqueOrThrow({ where: { id } });
-    if (order.orderStatus !== "IN_PROCESS")
-        throw new BadRequestException("Order status cannot be completed", ErrorCode.ORDER_NOT_IN_PROCESS);
-
-    try {
-        return await prisma.order.update({
-            where: { id },
-            data: { orderStatus: "COMPLETED", paymentStatus: "PAID" },
-            select: { id: true },
-        });
     } catch (_error) {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
     }

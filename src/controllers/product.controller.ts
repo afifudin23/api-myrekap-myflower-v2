@@ -93,7 +93,11 @@ export const getMonthlyStockReport = async (req: Request, res: Response, next: N
     }
 
     try {
-        const data = await productService.getReport(Number(month), Number(year), String(type).toUpperCase());
+        const data = await productService.getReport(
+            Number(month),
+            Number(year),
+            String(type).toUpperCase() as "STOCK_IN" | "STOCK_OUT"
+        );
         res.json({ message: "Monthly stock report retrieved successfully", data });
     } catch (error) {
         return next(error);

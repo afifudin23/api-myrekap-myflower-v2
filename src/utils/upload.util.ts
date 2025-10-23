@@ -6,7 +6,7 @@ import multer, { FileFilterCallback } from "multer";
 import path from "path";
 const storage = multer.memoryStorage();
 
-const fileFilter = (_req: any, file: any, cb: FileFilterCallback) => {
+const fileFilter = (_req: Request, file: any, cb: FileFilterCallback) => {
     if (!file.mimetype.startsWith("image/")) {
         return cb(
             new UnprocessableUntityException("Only image files are allowed", ErrorCode.UNPROCESSABLE_ENTITY, null)

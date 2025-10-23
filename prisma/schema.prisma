@@ -150,11 +150,11 @@ model Order {
   userId    String @map("user_id")
 
   // Customer
-  customerName     String           @map("customer_name")
-  customerCategory CustomerCategory @default(UMUM) @map("customer_category")
-  phoneNumber      String           @map("phone_number")
-  deliveryOption   DeliveryOption   @map("delivery_option")
-  readyDate        DateTime         @map("ready_date")
+  customerName     String            @map("customer_name")
+  customerCategory CustomerCategory? @default(UMUM) @map("customer_category")
+  phoneNumber      String            @map("phone_number")
+  deliveryOption   DeliveryOption    @map("delivery_option")
+  readyDate        DateTime          @map("ready_date")
 
   // Delivery
   shippingCost    Int     @default(0) @map("shipping_cost")

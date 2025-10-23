@@ -9,6 +9,8 @@ import {
 import { cloudinary, prisma, uploadFile } from "@/config";
 import { formatters, upload } from "@/utils";
 import { ordersMyRekapSchema } from "@/schemas";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { mailerService } from "@/services";
 
 export const findAll = async (query: any) => {
     const { month, year, from_date, to_date, customer_category, payment_method, payment_status, order_status } = query;
@@ -155,7 +157,10 @@ export const create = async (userId: string, body: ordersMyRekapSchema.CreateTyp
                 select: { id: true },
             })
         );
-        return (await prisma.$transaction(transactionOps)).at(-1);
+        const result = (await prisma.$transaction(transactionOps)).at(-1);
+        // FIX IT
+        await mailerService.sendNewOrderNotificationToManager(result.id);
+        return result;
     } catch (error) {
         console.log(error);
         throw new InternalException("Something went wrong", ErrorCode.INTERNAL_EXCEPTION, error);
@@ -306,14 +311,14 @@ export const update = async (id: string, body: ordersMyRekapSchema.UpdateType, f
 export const updateStatus = async (
     orderId: string,
     userId: string,
-    orderStatus: "COMPLETED" | "DELIVERY" | "IN_PROCESS" | "CANCELED",
+    orderStatus: ordersMyRekapSchema.UpdateOrderStatusType["status"],
     file?: Express.Multer.File
 ) => {
     // Check if order exists
     const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
     if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
 
-    if (order.source !== "MYREKAP")
+    if (order.source !== "MYREKAP" && !["IN_PROCESS", "DELIVERY"].includes(orderStatus))
         throw new ForbiddenException(
             "Forbidden: Order source is not from 'MYREKAP'",
             ErrorCode.ORDER_SOURCE_NOT_MYREKAP
@@ -353,8 +358,8 @@ export const updateStatus = async (
 
     // Update order status
     const dataOrderStatus: {
-        orderStatus: "COMPLETED" | "DELIVERY" | "IN_PROCESS" | "CANCELED";
-        paymentStatus?: "PAID" | "UNPAID";
+        orderStatus: OrderStatus;
+        paymentStatus?: PaymentStatus;
     } = { orderStatus };
     const transactionOps = [];
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -406,7 +411,9 @@ export const updateStatus = async (
     // Update order
     try {
         const result = await prisma.$transaction(transactionOps);
-        // if (order.source === "MYFLOWER") mailerService.sendUpdateOrderStatusEmail(updatedOrder);
+        // FIX IT
+        if (order.source === "MYFLOWER" && ["IN_PROCESS", "DELIVERY"].includes(orderStatus))
+            mailerService.sendMyRekapOrderStatusEmail(orderId);
         return result.at(-1);
     } catch (_error) {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);

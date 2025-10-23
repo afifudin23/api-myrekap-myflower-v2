@@ -4,6 +4,7 @@ import { formatters } from "@/utils";
 import { InternalException, MidtransException, NotFoundException } from "@/exceptions";
 import ErrorCode from "@/constants/error-code";
 import { prisma } from "@/config";
+import { mailerService } from "@/services";
 
 const snap = new midtransClient.Snap({
     isProduction: false,
@@ -31,7 +32,7 @@ export const notification = async (data: any) => {
         const transactionStatus = notification.transaction_status;
         const orderCode = notification.metadata.order_id || order_id;
 
-        const order = await prisma.order.findUnique({ where: { orderCode: orderCode } });
+        const order = await prisma.order.findUnique({ where: { orderCode: orderCode }, select: { id: true } });
         if (!order) {
             console.log("Order not found");
             return;
@@ -41,7 +42,7 @@ export const notification = async (data: any) => {
             case "capture":
             case "settlement": {
                 const { paymentMethod, paymentProvider } = formatters.generatePaymentInfo(notification);
-                const updatedOrder = await prisma.order.update({
+                await prisma.order.update({
                     where: { orderCode: orderCode },
                     data: {
                         paymentStatus: "PAID",
@@ -50,8 +51,9 @@ export const notification = async (data: any) => {
                     },
                     include: { user: true, items: { include: { product: true } } },
                 });
-                // await mailerService.sendCustomerOrderStatusEmail(updatedOrder.user, "create", updatedOrder);
-                await prisma.cartItem.deleteMany({ where: { userId: updatedOrder.userId } });
+                // FIX IT
+                await mailerService.sendMyFlowerOrderStatusEmail(order.id, "create");
+                await mailerService.sendNewOrderNotificationToManager(order.id);
                 break;
             }
             case "cancel": {

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Pesanan Baru Masuk</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333">
+        <div style="max-width: 600px; margin: auto; border: 1px solid #e2e2e2; padding: 20px; border-radius: 8px">
+            <h2>Halo Owner 👋</h2>
+            <p>Pesanan: <strong>{{params.orderCode}}</strong></p>
+            <p>Ada pesanan baru yang baru saja dibuat di Toko Bunga Anda!</p>
+
+            <p><strong>Detail pesanan:</strong></p>
+            <ul>
+                <li><strong>Nama Pelanggan:</strong> {{params.customerName}}</li>
+                <li><strong>Kategori Pelanggan:</strong> {{params.customerCategory}}</li>
+                <li><strong>Nomor Telepon:</strong> {{params.phoneNumber}}</li>
+                {% if params.paymentProvider %}
+                <li><strong>Metode Pembayaran:</strong> {{params.paymentMethod}} - {{params.paymentProvider}}</li>
+                { % else %}
+                <li><strong>Metode Pembayaran:</strong> {{params.paymentMethod}}</li>
+                {% endif %}
+                <li><strong>Total Harga:</strong> {{params.totalPrice}}</li>
+                <li><strong>Tanggal Produk Jadi:</strong> {{params.readyDate}}</li>
+                <li><strong>Metode Pengiriman:</strong> {{params.deliveryOption}}</li>
+                {% if params.deliveryOption == "Kirim ke Alamat" %}
+                <li><strong>Alamat Pengiriman:</strong> {{params.deliveryAddress}}</li>
+                <li><strong>Biaya Pengiriman:</strong> {{params.shippingCost}}</li>
+                {% endif %}
+            </ul>
+
+            <p><strong>Daftar Produk:</strong></p>
+            <pre>{{params.items}}</pre>
+
+            <p>Segera cek dashboard untuk memproses pesanan ini.</p>
+
+            <p>Salam,<br />Sistem Notifikasi Toko Anda</p>
+        </div>
+    </body>
+</html>

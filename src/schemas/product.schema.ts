@@ -32,6 +32,8 @@ export const manageStock = z.object({
     note: z.string({ invalid_type_error: "Note must be a string" }).nonempty("Note is not empty").optional(),
 });
 
+export type ManageStockType = z.infer<typeof manageStock>;
+
 export const createReport = z.object({
     month: z.coerce.number({ invalid_type_error: "Month must be a number" }).min(1, "Month must be greater than 0"),
     year: z.coerce.number({ invalid_type_error: "Year must be a number" }).min(1, "Year must be greater than 0"),

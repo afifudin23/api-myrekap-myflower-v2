@@ -148,7 +148,7 @@ export const remove = async (id: string) => {
     }
 };
 
-export const manageStock = async (id: string, userId: string, body: any) => {
+export const manageStock = async (id: string, userId: string, body: productSchema.ManageStockType) => {
     const product = await prisma.product.findUnique({ where: { id } });
     if (!product) throw new NotFoundException("Product not found", ErrorCode.PRODUCT_NOT_FOUND);
 
@@ -171,7 +171,7 @@ export const manageStock = async (id: string, userId: string, body: any) => {
     return transaction;
 };
 
-export const getReport = async (month: number, year: number, type: any) => {
+export const getReport = async (month: number, year: number, type: "STOCK_IN" | "STOCK_OUT") => {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
 

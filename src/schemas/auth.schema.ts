@@ -1,10 +1,12 @@
 import { OtpType } from "@prisma/client";
-import { z } from "zod";
+import { TypeOf, z } from "zod";
 
 export const login = z.object({
     username: z.string(),
     password: z.string(),
 });
+
+export type LoginType = TypeOf<typeof login>;
 
 export const registerCustomer = z
     .object({
@@ -31,6 +33,8 @@ export const registerCustomer = z
             });
         }
     });
+
+export type RegisterCustomerType = TypeOf<typeof registerCustomer>;
 
 export const resendUserOtp = z.object({
     email: z.string().email(),

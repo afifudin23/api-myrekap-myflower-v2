@@ -7,7 +7,7 @@ CREATE TABLE `users` (
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `phone_number` VARCHAR(191) NOT NULL,
-    `customer_category` ENUM('umum', 'pemda', 'akademik', 'rumah_sakit', 'polisi_militer', 'perbankan') NULL,
+    `customer_category` ENUM('umum', 'pemda', 'perbankan') NULL,
     `role` ENUM('admin', 'superadmin', 'customer') NOT NULL,
     `is_verified` BOOLEAN NOT NULL DEFAULT false,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -60,7 +60,7 @@ CREATE TABLE `stock_transactions` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `MonthlyStockReport` (
+CREATE TABLE `monthly_stock_reports` (
     `id` VARCHAR(191) NOT NULL,
     `product_id` VARCHAR(191) NOT NULL,
     `month` INTEGER NOT NULL,
@@ -71,6 +71,7 @@ CREATE TABLE `MonthlyStockReport` (
     `final_stock` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `monthly_stock_reports_product_id_month_year_key`(`product_id`, `month`, `year`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -104,17 +105,16 @@ CREATE TABLE `orders` (
     `order_code` VARCHAR(191) NOT NULL,
     `user_id` VARCHAR(191) NOT NULL,
     `customer_name` VARCHAR(191) NOT NULL,
-    `customer_category` ENUM('umum', 'pemda', 'akademik', 'rumah_sakit', 'polisi_militer', 'perbankan') NOT NULL DEFAULT 'umum',
+    `customer_category` ENUM('umum', 'pemda', 'perbankan') NULL DEFAULT 'umum',
     `phone_number` VARCHAR(191) NOT NULL,
-    `delivery_option` ENUM('delivery', 'pickup') NOT NULL,
+    `delivery_option` ENUM('delivery', 'self_pickup') NOT NULL,
     `ready_date` DATETIME(3) NOT NULL,
     `shipping_cost` INTEGER NOT NULL DEFAULT 0,
     `delivery_address` VARCHAR(191) NULL,
     `total_price` INTEGER NOT NULL,
     `payment_method` ENUM('cod', 'cash', 'bank_transfer', 'credit_card', 'cstore', 'qris', 'ewallet') NULL,
     `payment_provider` VARCHAR(191) NULL,
-    `payment_status` ENUM('pending', 'unpaid', 'paid', 'canceled', 'expired', 'refunded', 'denied') NOT NULL DEFAULT 'pending',
-    `previous_payment_status` ENUM('pending', 'unpaid', 'paid', 'canceled', 'expired', 'refunded', 'denied') NULL,
+    `payment_status` ENUM('pending', 'unpaid', 'paid', 'expired', 'refunded', 'denied') NOT NULL DEFAULT 'pending',
     `order_status` ENUM('in_process', 'delivery', 'completed', 'canceled') NOT NULL DEFAULT 'in_process',
     `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -136,16 +136,16 @@ CREATE TABLE `order_items` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `payment_proofs` (
+CREATE TABLE `order_images` (
     `id` VARCHAR(191) NOT NULL,
+    `order_id` VARCHAR(191) NOT NULL,
+    `type` ENUM('payment_proof', 'finished_product') NOT NULL,
     `file_name` VARCHAR(191) NOT NULL,
     `size` INTEGER NOT NULL,
     `public_id` VARCHAR(191) NOT NULL,
     `secure_url` VARCHAR(191) NOT NULL,
-    `type` ENUM('payment_proof', 'finished_product') NOT NULL,
-    `order_id` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `payment_proofs_order_id_type_key`(`order_id`, `type`),
+    UNIQUE INDEX `order_images_order_id_type_key`(`order_id`, `type`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -165,10 +165,10 @@ CREATE TABLE `reviews` (
 ALTER TABLE `user_otp` ADD CONSTRAINT `user_otp_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `stock_transactions` ADD CONSTRAINT `stock_transactions_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `stock_transactions` ADD CONSTRAINT `stock_transactions_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `MonthlyStockReport` ADD CONSTRAINT `MonthlyStockReport_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `monthly_stock_reports` ADD CONSTRAINT `monthly_stock_reports_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `product_images` ADD CONSTRAINT `product_images_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -189,7 +189,7 @@ ALTER TABLE `order_items` ADD CONSTRAINT `order_items_product_id_fkey` FOREIGN K
 ALTER TABLE `order_items` ADD CONSTRAINT `order_items_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `payment_proofs` ADD CONSTRAINT `payment_proofs_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `order_images` ADD CONSTRAINT `order_images_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `reviews` ADD CONSTRAINT `reviews_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

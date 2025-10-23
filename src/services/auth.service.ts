@@ -7,8 +7,9 @@ import { env, prisma } from "@/config";
 import { OtpType } from "@prisma/client";
 import { AppNameType } from "@/middlewares";
 import { formatters } from "@/utils";
+import { authSchema } from "@/schemas";
 
-export const login = async (body: any, appName: AppNameType) => {
+export const login = async (body: authSchema.LoginType, appName: AppNameType) => {
     // check if the user exists
     const user = await prisma.user.findUnique({
         where: { username: body.username },
@@ -33,7 +34,7 @@ export const login = async (body: any, appName: AppNameType) => {
     return { data: { fullName: user.fullName, role: user.role }, token };
 };
 
-export const registerCustomer = async (body: any) => {
+export const registerCustomer = async (body: authSchema.RegisterCustomerType) => {
     // check if the username or email is already taken
     const existingUser = await prisma.user.findFirst({
         where: { OR: [{ username: body.username }, { email: body.email }] },
@@ -43,7 +44,6 @@ export const registerCustomer = async (body: any) => {
         throw new BadRequestException("The username or email is already taken", ErrorCode.USER_ALREADY_EXISTS);
 
     // hash password and create user
-    delete body.confPassword;
     try {
         const hashPassword = await argon2.hash(body.password);
         const user = await prisma.user.create({
@@ -51,6 +51,7 @@ export const registerCustomer = async (body: any) => {
                 userCode: formatters.generateCode("user"),
                 fullName: body.fullName,
                 username: body.username,
+                customerCategory: body.customerCategory,
                 email: body.email,
                 phoneNumber: body.phoneNumber,
                 password: hashPassword,
@@ -108,7 +109,8 @@ export const verifyOtp = async (email: string, type: OtpType, code: string) => {
             if (user.isVerified)
                 throw new BadRequestException("Email already verified", ErrorCode.EMAIL_ALREADY_VERIFIED);
             await tx.user.update({ where: { id: user.id }, data: { isVerified: true } });
-            return { email, type };
+            const accessToken = jwt.sign({ id: user.id, role: user.role }, env.JWT_ACCESS, { expiresIn: "1d" });
+            return { email, type, accessToken };
         }
 
         // if type is password reset, return a reset token

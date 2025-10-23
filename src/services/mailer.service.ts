@@ -1,11 +1,19 @@
 import { brevo, env, prisma } from "@/config";
 import ErrorCode from "@/constants/error-code";
-import { BadRequestException } from "@/exceptions";
+import { BadRequestException, NotFoundException } from "@/exceptions";
 import { formatters } from "@/utils";
 import { OtpType } from "@prisma/client";
 import { addMinutes } from "date-fns";
 import crypto from "crypto";
 import { AppNameType } from "@/middlewares";
+import {
+    DELIVERY_OPTION_LABELS,
+    DeliveryOptionType,
+    ORDER_STATUS_LABELS,
+    OrderStatusType,
+    PAYMENT_METHOD_LABELS,
+    PaymentMethodType,
+} from "@/constants/category";
 
 interface GenerateUserOtpProps {
     userId: string;
@@ -34,8 +42,8 @@ const sendTemplateEmail = async ({ to, name, templateId, params, appName }: Send
         });
 
         console.log("✅ Verification email sent to:", to);
-    } catch (err: any) {
-        console.error("❌ Failed to send email:", err.response?.body || err);
+    } catch (error: any) {
+        console.error("❌ Failed to send email:", error.response?.body || error);
         throw new Error("Failed to send verification email");
     }
 };
@@ -88,43 +96,117 @@ export const resendUserOtp = async (
     });
 };
 
-// export const sendUpdateOrderStatusEmail = async (data: any) => {
-//     const { user, customerName, orderCode, orderStatus, paymentMethod, paymentProvider, totalPrice, items } = data;
+export const sendMyRekapOrderStatusEmail = async (id: string) => {
+    const order = await prisma.order.findUnique({
+        where: { id },
+        select: {
+            orderCode: true,
+            customerName: true,
+            paymentMethod: true,
+            paymentProvider: true,
+            totalPrice: true,
+            orderStatus: true,
+            user: { select: { email: true, fullName: true } },
+            items: { include: { product: { select: { name: true } } } },
+        },
+    });
+    if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
 
-//     await sendTemplateEmail({
-//         to: user.email,
-//         name: user.fullName,
-//         templateId: 5,
-//         appName,
-//         params: {
-//             customerName,
-//             orderCode,
-//             orderStatus: ORDER_STATUS_LABELS[orderStatus],
-//             paymentMethod: PAYMENT_METHOD_LABELS[paymentMethod],
-//             paymentProvider: paymentProvider ? paymentProvider : "-",
-//             totalPrice: formatters.formatRupiah(totalPrice),
-//             items: formatters.formatItemsAsList(items),
-//         },
-//     });
-// };
+    await sendTemplateEmail({
+        to: order.user.email,
+        name: order.user.fullName,
+        templateId: 5,
+        appName: "myrekap",
+        params: {
+            orderCode: order.orderCode,
+            customerName: order.customerName,
+            paymentMethod: order.paymentMethod
+                ? PAYMENT_METHOD_LABELS[order.paymentMethod as PaymentMethodType]
+                : "BELUM DIBAYAR",
+            paymentProvider: order.paymentProvider ?? undefined,
+            totalPrice: formatters.formatRupiah(order.totalPrice),
+            orderStatus: ORDER_STATUS_LABELS[order.orderStatus as OrderStatusType],
+            items: formatters.formatItemsAsList(order.items),
+        },
+    });
+};
 
-// export const sendCustomerOrderStatusEmail = async (user: any, method: string, data: any) => {
-//     const { customerName, orderCode, orderStatus, paymentMethod, paymentProvider, totalPrice, items } = data;
+export const sendMyFlowerOrderStatusEmail = async (id: string, status: "create" | "cancel" | "confirm") => {
+    const order = await prisma.order.findUnique({
+        where: { id },
+        select: {
+            orderCode: true,
+            customerName: true,
+            paymentMethod: true,
+            paymentProvider: true,
+            totalPrice: true,
+            orderStatus: true,
+            user: { select: { email: true, fullName: true } },
+            items: { include: { product: { select: { name: true } } } },
+        },
+    });
+    if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
 
-//     await sendTemplateEmail({
-//         to: user.email,
-//         name: user.fullName,
-//         templateId: 6,
-//         appName,
-//         params: {
-//             method,
-//             customerName,
-//             orderCode,
-//             orderStatus: ORDER_STATUS_LABELS[orderStatus],
-//             paymentMethod: paymentMethod ? PAYMENT_METHOD_LABELS[paymentMethod] : "-",
-//             paymentProvider: paymentProvider ? paymentProvider : "-",
-//             totalPrice: formatters.formatRupiah(totalPrice),
-//             items: formatters.formatItemsAsList(items),
-//         },
-//     });
-// };
+    await sendTemplateEmail({
+        to: order.user.email,
+        name: order.user.fullName,
+        templateId: 6,
+        appName: "myflower",
+        params: {
+            orderCode: order.orderCode,
+            customerName: order.customerName,
+            paymentMethod: order.paymentMethod
+                ? PAYMENT_METHOD_LABELS[order.paymentMethod as PaymentMethodType]
+                : "BELUM DIBAYAR",
+            paymentProvider: order.paymentProvider ?? undefined,
+            totalPrice: formatters.formatRupiah(order.totalPrice),
+            orderStatus: ORDER_STATUS_LABELS[order.orderStatus as OrderStatusType],
+            items: formatters.formatItemsAsList(order.items),
+            status,
+        },
+    });
+};
+
+export const sendNewOrderNotificationToManager = async (id: string) => {
+    const order = await prisma.order.findUnique({
+        where: { id },
+        select: {
+            orderCode: true,
+            customerName: true,
+            customerCategory: true,
+            phoneNumber: true,
+            readyDate: true,
+            deliveryOption: true,
+            deliveryAddress: true,
+            shippingCost: true,
+            paymentMethod: true,
+            paymentProvider: true,
+            totalPrice: true,
+            items: { include: { product: { select: { name: true } } } },
+        },
+    });
+    if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
+
+    await sendTemplateEmail({
+        to: env.MANAGER_EMAIL,
+        name: "Manager Toko Anda",
+        templateId: env.BREVO_TEMPLATE_ORDER_OWNER_ID,
+        appName: "myrekap",
+        params: {
+            orderCode: order.orderCode,
+            customerName: order.customerName,
+            customerCategory: order.customerCategory,
+            phoneNumber: order.phoneNumber,
+            readyDate: formatters.formatDateTime(order.readyDate),
+            deliveryOption: DELIVERY_OPTION_LABELS[order.deliveryOption as DeliveryOptionType],
+            deliveryAddress: order.deliveryAddress ?? undefined,
+            shippingCost: formatters.formatRupiah(order.shippingCost),
+            paymentMethod: order.paymentMethod
+                ? PAYMENT_METHOD_LABELS[order.paymentMethod as PaymentMethodType]
+                : "BELUM DIBAYAR",
+            paymentProvider: order.paymentProvider ?? undefined,
+            totalPrice: formatters.formatRupiah(order.totalPrice),
+            items: formatters.formatItemsAsList(order.items),
+        },
+    });
+};

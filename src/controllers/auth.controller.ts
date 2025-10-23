@@ -65,7 +65,11 @@ export const registerCustomer = async (req: Request, res: Response, next: NextFu
 
 export const resendUserOtp = async (req: Request, res: Response, next: NextFunction) => {
     const appName = (req.headers["x-app-name"] as string)?.toLowerCase() as AppNameType;
-    if (!appName) throw new BadRequestException("Missing required header: x-app-name", ErrorCode.REQUIRED_APP_NAME);
+    if (!appName)
+        throw new BadRequestException(
+            "Invalid or missing header: x-app-name. Allowed values are 'myrekap' or 'myflower'.",
+            ErrorCode.REQUIRED_APP_NAME
+        );
 
     const { email, type } = authSchema.resendUserOtp.parse(req.body);
     try {
@@ -81,9 +85,23 @@ export const resendUserOtp = async (req: Request, res: Response, next: NextFunct
 
 export const verifyUserOtp = async (req: Request, res: Response, next: NextFunction) => {
     const { email, type, code } = authSchema.verifyUserOtp.parse(req.body);
+    const appName = (req.headers["x-app-name"] as string)?.toLowerCase() as AppNameType;
+    if (!appName)
+        throw new BadRequestException(
+            "Invalid or missing header: x-app-name. Allowed values are 'myrekap' or 'myflower'.",
+            ErrorCode.REQUIRED_APP_NAME
+        );
 
     try {
         const data = await authService.verifyOtp(email, type, code);
+        if (type === "EMAIL_VERIFICATION")
+            res.cookie(`token_${appName}`, data?.accessToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: "strict",
+                maxAge: 60 * 60 * 24 * 1000,
+                path: "/",
+            });
         res.status(200).json({ message: "Verify user otp successfully", data });
     } catch (error) {
         return next(error);

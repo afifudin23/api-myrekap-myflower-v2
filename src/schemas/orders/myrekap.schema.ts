@@ -213,3 +213,5 @@ export const updateOrderStatus = z.object({
         })
     ),
 });
+
+export type UpdateOrderStatusType = z.infer<typeof updateOrderStatus>;

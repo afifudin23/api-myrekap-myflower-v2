@@ -14,6 +14,7 @@ export enum ErrorCode {
     FORBIDDEN = 2002,
     REQUIRED_APP_NAME = 2003,
     INVALID_TOKEN = 2004,
+    REQUIRED_PARAM = 2005,
 
     // Order
     ORDER_NOT_FOUND = 3001,

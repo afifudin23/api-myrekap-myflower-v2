@@ -3,27 +3,27 @@ import { authMiddleware, requireMyRekapApp } from "@/middlewares";
 import { errorHandler, upload } from "@/utils";
 import { Router } from "express";
 
-const ordersAdminRouter: Router = Router();
+const ordersMyRekapRouter: Router = Router();
 
-ordersAdminRouter.get("/", [authMiddleware, requireMyRekapApp], errorHandler(ordersMyRekapController.getAllOrders));
-ordersAdminRouter.get("/:id", [authMiddleware, requireMyRekapApp], errorHandler(ordersMyRekapController.getOrderById));
-ordersAdminRouter.post(
+ordersMyRekapRouter.get("/", [authMiddleware, requireMyRekapApp], errorHandler(ordersMyRekapController.getAllOrders));
+ordersMyRekapRouter.get("/:id", [authMiddleware, requireMyRekapApp], errorHandler(ordersMyRekapController.getOrderById));
+ordersMyRekapRouter.post(
     "/",
     [authMiddleware, requireMyRekapApp],
     upload.single("paymentProof"),
     errorHandler(ordersMyRekapController.createOrder)
 );
-ordersAdminRouter.patch(
+ordersMyRekapRouter.patch(
     "/:id",
     [authMiddleware, requireMyRekapApp],
     upload.single("paymentProof"),
     errorHandler(ordersMyRekapController.updateOrder)
 );
-ordersAdminRouter.patch(
+ordersMyRekapRouter.patch(
     "/:id/status",
     [authMiddleware, requireMyRekapApp],
     upload.single("finishedProduct"),
     errorHandler(ordersMyRekapController.updateOrderStatus)
 );
 
-export default ordersAdminRouter;
+export default ordersMyRekapRouter;

@@ -56,8 +56,7 @@ export const generatePaymentInfo = (notification: any) => {
     return { paymentMethod: paymentMethod.toUpperCase(), paymentProvider: paymentProvider.toUpperCase() };
 };
 
-export const isoDateToStringDateTime = (isoDate: string) => {
-    const date = new Date(isoDate);
+export const formatDateTime = (date: Date) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
@@ -65,13 +64,6 @@ export const isoDateToStringDateTime = (isoDate: string) => {
     const minutes = String(date.getMinutes()).padStart(2, "0");
 
     return `${day}-${month}-${year} ${hours}:${minutes}`;
-};
-
-export const formatCapital = (data: string) => {
-    return data
-        .toLowerCase() // change to lowercase
-        .replace(/_/g, " ") // change underscore to space
-        .replace(/\b\w/g, (char) => char.toUpperCase()); // cpitalize each word
 };
 
 export const formatRupiah = (data: number) => {
@@ -82,7 +74,9 @@ export const formatRupiah = (data: number) => {
     }).format(data);
 };
 
-export const formatItemsAsList = (items: any[]) => {
+export const formatItemsAsList = (
+    items: { quantity: number; unitPrice: number; totalPrice: number; product: { name: string } }[]
+) => {
     return items
         .map(
             (item, i) =>
@@ -93,10 +87,12 @@ export const formatItemsAsList = (items: any[]) => {
         .join("\n");
 };
 
-export const generateItemDetails = (orderItems: any[]) => {
+export const generateItemDetails = (
+    orderItems: { productId: string; unitPrice: number; quantity: number; product: { name: string } }[]
+) => {
     return orderItems.map((item) => ({
         id: item.productId,
-        name: item.product?.name,
+        name: item.product.name,
         price: item.unitPrice,
         quantity: item.quantity,
     }));
