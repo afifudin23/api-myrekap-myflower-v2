@@ -43,7 +43,7 @@ export const create = z
             .string({ invalid_type_error: "Delivery address must be a string" })
             .transform((val) => (val === "" ? null : val))
             .nullish(),
-        shippingCost: z.coerce.number().positive("Shipping cost must be a positive number").default(0),
+        shippingCost: z.preprocess((value) => (value ? Number(value) : 0), z.number()),
         isPaid: z
             .string()
             .transform((val) => val.toLowerCase())
@@ -52,7 +52,7 @@ export const create = z
             })
             .transform((val) => val === "true"),
         paymentMethod: z.preprocess(
-            (val) => (typeof val === "string" ? val.toUpperCase() : val),
+            (val) => (typeof val === "string" && val !== "null" ? val.toUpperCase() : null),
             z
                 .enum(["CASH", "BANK_TRANSFER"], {
                     invalid_type_error: "Payment method must be a valid enum value",
