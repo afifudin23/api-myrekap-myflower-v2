@@ -142,7 +142,7 @@ export const update = z
             .string({ invalid_type_error: "Delivery address must be a string" })
             .transform((val) => (val === "" ? null : val))
             .nullish(),
-        shippingCost: z.coerce.number().positive("Shipping cost must be a positive number").optional(),
+        shippingCost: z.preprocess((value) => (value ? Number(value) : 0), z.number().optional()),
         isPaid: z
             .string()
             .transform((val) => val.toLowerCase())
@@ -150,15 +150,15 @@ export const update = z
                 message: "isPaid must be either 'true' or 'false'",
             })
             .transform((val) => val === "true"),
-        paymentMethod: z
-            .preprocess(
-                (val) => (typeof val === "string" ? val.toUpperCase() : val),
-                z.enum(["CASH", "BANK_TRANSFER"], {
+        paymentMethod: z.preprocess(
+            (val) => (typeof val === "string" && val !== "null" ? val.toUpperCase() : null),
+            z
+                .enum(["CASH", "BANK_TRANSFER"], {
                     invalid_type_error: "Payment method must be a valid enum value",
                     required_error: "Payment method is required",
                 })
-            )
-            .nullish(),
+                .nullish()
+        ),
     })
     .superRefine((data, ctx) => {
         // If delivery option is "SELF_PICKUP", set delivery address to null
