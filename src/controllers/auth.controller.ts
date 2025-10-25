@@ -94,7 +94,7 @@ export const verifyUserOtp = async (req: Request, res: Response, next: NextFunct
 
     try {
         const data = await authService.verifyOtp(email, type, code);
-        if (type === "EMAIL_VERIFICATION")
+        if (type === "EMAIL_VERIFICATION") {
             res.cookie(`token_${appName}`, data?.accessToken, {
                 httpOnly: true,
                 secure: false,
@@ -102,6 +102,10 @@ export const verifyUserOtp = async (req: Request, res: Response, next: NextFunct
                 maxAge: 60 * 60 * 24 * 1000,
                 path: "/",
             });
+            return res
+                .status(200)
+                .json({ message: "Verify user otp successfully", data: { email, type, ...data?.user } });
+        }
         res.status(200).json({ message: "Verify user otp successfully", data });
     } catch (error) {
         return next(error);

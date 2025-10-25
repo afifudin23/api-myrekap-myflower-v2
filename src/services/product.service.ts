@@ -185,7 +185,10 @@ export const getReport = async (month: number, year: number, type: "STOCK_IN" | 
 
     try {
         // Get all products less than endDate by type summary
-        return await prisma.monthlyStockReport.findMany({ where: { month, year } });
+        return await prisma.monthlyStockReport.findMany({
+            where: { month, year },
+            include: { product: { select: { productCode: true, name: true } } },
+        });
     } catch (_error) {
         throw new NotFoundException("Monthly stock report not found", ErrorCode.MONTHLY_STOCK_REPORT_NOT_FOUND);
     }

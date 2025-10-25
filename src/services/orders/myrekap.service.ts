@@ -252,9 +252,10 @@ export const update = async (id: string, body: ordersMyRekapSchema.UpdateType, f
     }
 
     try {
-        if (!body.isPaid && existingOrder.images.length === 1) {
+        if ((!body.isPaid || body.paymentMethod !== "BANK_TRANSFER") && existingOrder.images.length === 1) {
             await cloudinary.uploader.destroy(existingOrder.images[0].publicId);
             transactionOps.push(prisma.orderImage.delete({ where: { id: existingOrder.images[0].id } }));
+            console.log(123);
         }
         if (file?.buffer) {
             if (existingOrder.images.length > 0) {
@@ -310,27 +311,27 @@ export const update = async (id: string, body: ordersMyRekapSchema.UpdateType, f
 export const updateStatus = async (
     orderId: string,
     userId: string,
-    orderStatus: ordersMyRekapSchema.UpdateOrderStatusType["status"],
+    body: ordersMyRekapSchema.UpdateOrderStatusType,
     file?: Express.Multer.File
 ) => {
     // Check if order exists
     const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
     if (!order) throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
 
-    if (order.source !== "MYREKAP" && !["IN_PROCESS", "DELIVERY"].includes(orderStatus))
+    if (order.source !== "MYREKAP" && !["IN_PROCESS", "DELIVERY"].includes(body.status))
         throw new ForbiddenException(
             "Forbidden: Order source is not from 'MYREKAP'",
             ErrorCode.ORDER_SOURCE_NOT_MYREKAP
         );
 
-    if (order.deliveryOption !== "DELIVERY" && orderStatus === "DELIVERY")
+    if (order.deliveryOption !== "DELIVERY" && body.status === "DELIVERY")
         throw new BadRequestException(
             "Order delivery option is not delivery, cannot update to delivery",
             ErrorCode.DELIVERY_OPTION_NOT_DELIVERY
         );
 
     // Check if finished product exists
-    if (file) {
+    if (body.isDeleteImage || file) {
         // Delete existing finished product
         const existingfile = await prisma.orderImage.findUnique({
             where: { orderId_type: { orderId, type: "FINISHED_PRODUCT" } },
@@ -339,8 +340,10 @@ export const updateStatus = async (
             await cloudinary.uploader.destroy(existingfile.publicId);
             await prisma.orderImage.delete({ where: { id: existingfile.id } });
         }
+    }
 
-        // Upload new finished product
+    // Upload new finished product
+    if (file) {
         const renamed = upload.renameFile(file.originalname, order.orderCode);
         const result = await uploadFile(file, "myrekap-v2/finished-product", renamed.fileName);
         await prisma.orderImage.create({
@@ -359,11 +362,11 @@ export const updateStatus = async (
     const dataOrderStatus: {
         orderStatus: OrderStatus;
         paymentStatus?: PaymentStatus;
-    } = { orderStatus };
+    } = { orderStatus: body.status };
     const transactionOps = [];
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    if (orderStatus === "CANCELED" && user) {
+    if (body.status === "CANCELED" && user) {
         // Create STOCK_IN history for cancellation
         for (const item of order.items) {
             transactionOps.push(
@@ -382,11 +385,11 @@ export const updateStatus = async (
             );
         }
     } else if (
-        ["COMPLETED", "IN_PROCESS", "DELIVERY"].includes(orderStatus) &&
+        ["COMPLETED", "IN_PROCESS", "DELIVERY"].includes(body.status) &&
         order.orderStatus === "CANCELED" &&
         user
     ) {
-        if (orderStatus === "COMPLETED") dataOrderStatus.paymentStatus = "PAID";
+        if (body.status === "COMPLETED") dataOrderStatus.paymentStatus = "PAID";
         // Create STOCK_OUT history for reactivation
         for (const item of order.items) {
             transactionOps.push(
@@ -405,12 +408,14 @@ export const updateStatus = async (
             );
         }
     }
-    transactionOps.push(prisma.order.update({ where: { id: orderId }, data: dataOrderStatus, select: { id: true } }));
+    transactionOps.push(
+        prisma.order.update({ where: { id: orderId }, data: dataOrderStatus, select: { id: true, orderStatus: true } })
+    );
 
     // Update order
     try {
         const result = await prisma.$transaction(transactionOps);
-        if (order.source === "MYFLOWER" && ["IN_PROCESS", "DELIVERY"].includes(orderStatus))
+        if (order.source === "MYFLOWER" && ["IN_PROCESS", "DELIVERY"].includes(body.status))
             mailerService.sendMyRekapOrderStatusEmail(orderId);
         return result.at(-1);
     } catch (_error) {

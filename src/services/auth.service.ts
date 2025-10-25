@@ -89,7 +89,10 @@ export const resendOtp = async (email: string, type: OtpType, appName: "myrekap"
 
 export const verifyOtp = async (email: string, type: OtpType, code: string) => {
     // check if the user exists
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true, email: true, isVerified: true, role: true, fullName: true },
+    });
     if (!user) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
 
     // check if the otp is valid
@@ -110,7 +113,7 @@ export const verifyOtp = async (email: string, type: OtpType, code: string) => {
                 throw new BadRequestException("Email already verified", ErrorCode.EMAIL_ALREADY_VERIFIED);
             await tx.user.update({ where: { id: user.id }, data: { isVerified: true } });
             const accessToken = jwt.sign({ id: user.id, role: user.role }, env.JWT_ACCESS, { expiresIn: "1d" });
-            return { email, type, accessToken };
+            return { email, type, accessToken, user: { fullName: user.fullName, role: user.role } };
         }
 
         // if type is password reset, return a reset token

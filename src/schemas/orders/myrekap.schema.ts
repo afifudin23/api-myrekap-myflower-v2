@@ -212,6 +212,7 @@ export const updateOrderStatus = z.object({
             invalid_type_error: "Order status must be a valid enum value",
         })
     ),
+    isDeleteImage: z.preprocess((val) => (val === "true" ? true : false), z.boolean()),
 });
 
 export type UpdateOrderStatusType = z.infer<typeof updateOrderStatus>;

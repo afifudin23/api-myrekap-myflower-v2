@@ -46,10 +46,11 @@ export const updateOrder = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
-    const { status } = ordersMyRekapSchema.updateOrderStatus.parse(req.body);
+    const body = ordersMyRekapSchema.updateOrderStatus.parse(req.body);
     try {
         const userId = (req as AuthReq).user.id;
-        const data = await ordersMyRekapService.updateStatus(req.params.id, userId, status, req.file);
+        console.log(req.file)
+        const data = await ordersMyRekapService.updateStatus(req.params.id, userId, body, req.file);
         res.json({ message: "Update order status successfully", data });
     } catch (error) {
         return next(error);
