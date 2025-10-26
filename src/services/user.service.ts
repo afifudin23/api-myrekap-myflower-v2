@@ -18,6 +18,15 @@ export const findAllCustomers = async () => {
     return data;
 };
 
+export const getMe = async (id: string) => {
+    const user = await prisma.user.findUnique({
+        where: { id },
+        select: { fullName: true, username: true, email: true, phoneNumber: true, customerCategory: true, role: true },
+    });
+    if (!user) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
+    return user;
+};
+
 export const create = async (body: userSchema.CreateType) => {
     const { username, email } = body;
 
@@ -108,6 +117,7 @@ export const updateProfile = async (userId: string, body: userSchema.UpdateProfi
                     username: body.username,
                     email: body.email,
                     phoneNumber: body.phoneNumber,
+                    customerCategory: body.customerCategory,
                     password: hashPassword,
                 },
                 select: { id: true },
@@ -125,6 +135,7 @@ export const updateProfile = async (userId: string, body: userSchema.UpdateProfi
                 username: body.username,
                 email: body.email,
                 phoneNumber: body.phoneNumber,
+                customerCategory: body.customerCategory,
             },
             select: { id: true },
         });

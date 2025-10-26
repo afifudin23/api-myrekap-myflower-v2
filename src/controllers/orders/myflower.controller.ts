@@ -48,3 +48,12 @@ export const updateOrderStatus = async (req: Request, res: Response, next: NextF
         next(error);
     }
 };
+
+export const deleteOrder = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const data = await ordersMyFlowerService.remove(req.params.orderCode);
+        res.json({ message: "Order deleted successfully", data });
+    } catch (error) {
+        return next(error);
+    }
+};

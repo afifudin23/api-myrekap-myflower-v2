@@ -11,6 +11,7 @@ userRouter.get(
     errorHandler(userController.getAllAdmins)
 );
 userRouter.get("/customers", [authMiddleware, requireMyRekapApp], errorHandler(userController.getAllCustomers));
+userRouter.get("/me", [authMiddleware], errorHandler(userController.getCurrentUser));
 userRouter.post(
     "/admins",
     [authMiddleware, requireMyRekapApp, superadminMiddleware, singleSuperadminMiddleware],
