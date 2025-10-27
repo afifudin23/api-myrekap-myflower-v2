@@ -84,7 +84,7 @@ export const getMonthlyStockReport = async (req: Request, res: Response, next: N
             null
         );
     }
-    if (!["summary", "stock_in", "stock_out"].includes(String(type).toLowerCase())) {
+    if (!["general", "stock_in", "stock_out"].includes(String(type).toLowerCase())) {
         throw new UnprocessableUntityException(
             "Type must be summary, stock_in or stock_out",
             ErrorCode.UNPROCESSABLE_ENTITY,
