@@ -118,7 +118,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     if (!authHeader?.startsWith("Bearer "))
         throw new BadRequestException("Missing or invalid token", ErrorCode.INVALID_TOKEN);
     const token = authHeader.split(" ")[1];
-    
+
     try {
         await authService.resetPassword(token, password);
         res.status(200).json({ message: "Password reset successfully" });

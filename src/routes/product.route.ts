@@ -5,7 +5,7 @@ import { authMiddleware, requireMyRekapApp } from "@/middlewares";
 
 const productRouter: Router = Router();
 
-productRouter.get("/", [authMiddleware], errorHandler(productController.getAllProducts));
+productRouter.get("/", errorHandler(productController.getAllProducts));
 productRouter.get(
     "/stocks/monthly",
     [authMiddleware, requireMyRekapApp],
