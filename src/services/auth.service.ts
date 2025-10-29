@@ -1,6 +1,12 @@
 import argon2 from "argon2";
 import ErrorCode from "@/constants/error-code";
-import { BadRequestException, InternalException, NotFoundException, UnauthorizedException } from "../exceptions";
+import {
+    BadRequestException,
+    ForbiddenException,
+    InternalException,
+    NotFoundException,
+    UnauthorizedException,
+} from "../exceptions";
 import * as jwt from "jsonwebtoken";
 import { mailerService } from "@/services";
 import { env, prisma } from "@/config";
@@ -11,14 +17,19 @@ import { authSchema } from "@/schemas";
 
 export const login = async (body: authSchema.LoginType, appName: AppNameType) => {
     // check if the user exists
-    const user = await prisma.user.findUnique({
-        where: { username: body.username },
-    });
+    const user = await prisma.user.findUnique({ where: { username: body.username } });
     if (!user) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
 
     // check if the password is correct
     const isPasswordValid = await argon2.verify(user.password, body.password);
     if (!isPasswordValid) throw new UnauthorizedException("Invalid Password", ErrorCode.INVALID_PASSWORD);
+
+    // check role and appName
+    if (appName === "myrekap" && !["SUPERADMIN", "ADMIN"].includes(user.role))
+        throw new ForbiddenException("Forbidden access", ErrorCode.FORBIDDEN);
+
+    if (appName === "myflower" && !["CUSTOMER"].includes(user.role))
+        throw new ForbiddenException("Forbidden access", ErrorCode.FORBIDDEN);
 
     // check if the email is verified
     if (!user.isVerified) {

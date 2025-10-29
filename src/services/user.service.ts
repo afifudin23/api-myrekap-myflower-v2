@@ -21,7 +21,15 @@ export const findAllCustomers = async () => {
 export const getMe = async (id: string) => {
     const user = await prisma.user.findUnique({
         where: { id },
-        select: { fullName: true, username: true, email: true, phoneNumber: true, customerCategory: true, role: true },
+        select: {
+            id: true,
+            fullName: true,
+            username: true,
+            email: true,
+            phoneNumber: true,
+            customerCategory: true,
+            role: true,
+        },
     });
     if (!user) throw new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND);
     return user;
