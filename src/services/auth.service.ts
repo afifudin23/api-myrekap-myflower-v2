@@ -26,10 +26,10 @@ export const login = async (body: authSchema.LoginType, appName: AppNameType) =>
 
     // check role and appName
     if (appName === "myrekap" && !["SUPERADMIN", "ADMIN"].includes(user.role))
-        throw new ForbiddenException("Forbidden access", ErrorCode.FORBIDDEN);
+        throw new ForbiddenException("Access denied. Only Superadmin and Admin can access MyRekap", ErrorCode.FORBIDDEN);
 
     if (appName === "myflower" && !["CUSTOMER"].includes(user.role))
-        throw new ForbiddenException("Forbidden access", ErrorCode.FORBIDDEN);
+        throw new ForbiddenException("Access denied. Only Customer can access MyFlower", ErrorCode.FORBIDDEN);
 
     // check if the email is verified
     if (!user.isVerified) {

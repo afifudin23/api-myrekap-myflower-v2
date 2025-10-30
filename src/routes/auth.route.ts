@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authMiddleware } from "@/middlewares";
+import { authMiddleware, requireMyFlowerApp } from "@/middlewares";
 import { authController } from "@/controllers";
 import { errorHandler } from "@/utils";
 
@@ -7,7 +7,7 @@ const authRouter: Router = Router();
 
 authRouter.post("/login", errorHandler(authController.login));
 authRouter.post("/logout", authMiddleware, errorHandler(authController.logout));
-authRouter.post("/register", errorHandler(authController.registerCustomer));
+authRouter.post("/register", [requireMyFlowerApp], errorHandler(authController.registerCustomer));
 authRouter.get("/verify-auth", authMiddleware, errorHandler(authController.verifyAuth));
 authRouter.post("/otp/resend", errorHandler(authController.resendUserOtp));
 authRouter.post("/otp/verify", errorHandler(authController.verifyUserOtp));

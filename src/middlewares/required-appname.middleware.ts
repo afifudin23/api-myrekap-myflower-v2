@@ -1,5 +1,5 @@
 import ErrorCode from "@/constants/error-code";
-import { ForbiddenException } from "@/exceptions";
+import { BadRequestException } from "@/exceptions";
 import { AppNameType } from ".";
 import { Request, Response, NextFunction } from "express";
 
@@ -9,9 +9,9 @@ export const requireMyRekapApp = async (req: Request, _res: Response, next: Next
         next();
     } else {
         return next(
-            new ForbiddenException(
-                "Unauthorized application access. This endpoint is restricted to requests containing 'x-app-name: myrekap' header",
-                ErrorCode.FORBIDDEN
+            new BadRequestException(
+                "Invalid header. This endpoint is restricted to requests containing 'x-app-name: myrekap' header",
+                ErrorCode.INVALID_APPNAME
             )
         );
     }
@@ -23,9 +23,9 @@ export const requireMyFlowerApp = async (req: Request, _res: Response, next: Nex
         next();
     } else {
         return next(
-            new ForbiddenException(
-                "Unauthorized application access. This endpoint is restricted to requests containing 'x-app-name: myflower' header",
-                ErrorCode.FORBIDDEN
+            new BadRequestException(
+                "Invalid header. This endpoint is restricted to requests containing 'x-app-name: myflower' header",
+                ErrorCode.INVALID_APPNAME
             )
         );
     }

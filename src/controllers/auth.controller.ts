@@ -47,7 +47,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
             secure: true, // Pastikan secure diaktifkan jika menggunakan HTTPS
             sameSite: "strict",
         });
-        res.status(200).json({ message: "Logout successful" });
+        res.status(200).json({ message: "Logout successfully" });
     } catch (error) {
         return next(error);
     }
@@ -116,7 +116,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     const { password } = authSchema.resetPassword.parse(req.body);
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer "))
-        throw new BadRequestException("Missing or invalid token", ErrorCode.INVALID_TOKEN);
+        throw new BadRequestException("Missing or invalid resetToken", ErrorCode.INVALID_TOKEN);
     const token = authHeader.split(" ")[1];
 
     try {
