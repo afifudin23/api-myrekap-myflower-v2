@@ -115,7 +115,7 @@ export const sendMyRekapOrderStatusEmail = async (id: string) => {
     await sendTemplateEmail({
         to: order.user.email,
         name: order.user.fullName,
-        templateId: 5,
+        templateId: env.BREVO_TEMPLATE_MYREKAP_ORDER_STATUS_ID,
         appName: "myrekap",
         params: {
             orderCode: order.orderCode,
@@ -150,7 +150,7 @@ export const sendMyFlowerOrderStatusEmail = async (id: string, status: "create" 
     await sendTemplateEmail({
         to: order.user.email,
         name: order.user.fullName,
-        templateId: 6,
+        templateId: env.BREVO_TEMPLATE_MYFLOWER_ORDER_STATUS_ID,
         appName: "myflower",
         params: {
             orderCode: order.orderCode,

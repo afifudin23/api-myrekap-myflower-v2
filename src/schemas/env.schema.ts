@@ -22,5 +22,7 @@ export const envSchema = object({
     BREVO_SENDER_EMAIL: string(),
     BREVO_TEMPLATE_OTP_ID: coerce.number(),
     BREVO_TEMPLATE_ORDER_OWNER_ID: coerce.number(),
+    BREVO_TEMPLATE_MYREKAP_ORDER_STATUS_ID: coerce.number(),
+    BREVO_TEMPLATE_MYFLOWER_ORDER_STATUS_ID: coerce.number(),
     MANAGER_EMAIL: string().email(),
 });

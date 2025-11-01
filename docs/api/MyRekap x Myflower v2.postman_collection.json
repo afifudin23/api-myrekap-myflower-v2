@@ -1,0 +1,1876 @@
+{
+	"info": {
+		"_postman_id": "be6976d7-7dc2-4671-9f25-283027c622e1",
+		"name": "MyRekap x Myflower v2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26888314",
+		"_collection_link": "https://orange-rocket-27h4432.postman.co/workspace/MyFlower-x-MyRekap~e78449be-29f6-43e6-a3e2-20fdce26f97b/collection/26888314-be6976d7-7dc2-4671-9f25-283027c622e1?action=share&source=collection_link&creator=26888314"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"johndoe\",\r\n    \"password\": \"223344\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/auth/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/auth/logout",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Auth",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/auth/verify-auth",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"verify-auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Customer",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\": \"John Doe\",\r\n    \"username\": \"johndoe\",\r\n    \"email\": \"johndoe@gmail.com\",\r\n    \"phoneNumber\": \"088844444\",\r\n\t\"customerCategory\": \"umum\",\r\n    \"password\": \"223344\",\r\n    \"confPassword\": \"223344\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/auth/register",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend OTP Verification Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"afifu5882@gmail.com\",\r\n    \"type\": \"email_verification\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/auth/otp/resend",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"resend"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend OTP Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"afifu5882@gmail.com\",\r\n    \"type\": \"password_reset\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/auth/otp/resend",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"resend"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP Verification Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"afifu5882@gmail.com\",\r\n    \"type\": \"email_verification\",\r\n    \"code\": \"793209\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/auth/otp/verify",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"afifu5882@gmail.com\",\r\n    \"type\": \"password_reset\",\r\n    \"code\": \"150830\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/auth/otp/verify",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWdxbTVsbmcwMDAwanhzb2xpbzdyN3d2IiwidHlwZSI6IlBBU1NXT1JEX1JFU0VUIiwiaWF0IjoxNzYwNTE4NDkwLCJleHAiOjE3NjA1MTkwOTB9.UYCw00b4ijgPZKh1iKvRWW1pHgqqltZyOFyQ-n9uIhQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\": \"123123\",\r\n    \"confPassword\": \"123123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/auth/reset-password",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\": \"John Doe\",\r\n    \"username\": \"johndoe\",\r\n    \"email\": \"johndoe@gmail.com\",\r\n    \"phoneNumber\": \"088844444\",\r\n\t\"customerCategory\": \"umum\",\r\n    \"oldPassword\": \"123123\",\r\n    \"confPassword\": \"223344\",\r\n\t\"newPassword\": \"223344\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/profile",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/users/me",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/users/customers",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/users/admins",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"admins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Admin",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\": \"John Doe\",\r\n    \"username\": \"johndoe1\",\r\n    \"email\": \"johndoe1@mail.com\",\r\n    \"phoneNumber\": \"088844444\",\r\n    \"password\": \"223344\",\r\n    \"confPassword\": \"223344\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/admins",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"admins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"fullName\": \"John Doe\",\r\n    \"username\": \"johndoe1\",\r\n    \"email\": \"johndoe1@gmail.com\",\r\n\t\"phoneNumber\": \"08938483843\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/admins/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"admins",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user-id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/users/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user-id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product By Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Bouquet Madinah",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "40000",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Ini Bouquetku",
+									"type": "text"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "postman-cloud:///1f057479-2ce8-4d30-9025-c31e260ec0df",
+									"disabled": true
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "postman-cloud:///1f03f88a-5808-41d0-b049-2a5f13f06a15"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/products",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Bouquet",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "50000",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Ini Bouquetku",
+									"type": "text"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "postman-cloud:///1f0ac288-998b-40c0-9a55-f63af641d40e",
+									"disabled": true
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "postman-cloud:///1f057479-2ce8-4d30-9025-c31e260ec0df",
+									"disabled": true
+								},
+								{
+									"key": "publicIdsToDelete",
+									"value": "myrekap-v2/products/bouquet-wedding/PRD-7AMGWBGO8W-B116B9-514",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/products/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Manage Stock Product",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"stock_out\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/products/:id/stock",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id",
+								"stock"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Monthly Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products/stocks/monthly?month=10&year=2025&type=general",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								"stocks",
+								"monthly"
+							],
+							"query": [
+								{
+									"key": "month",
+									"value": "10"
+								},
+								{
+									"key": "year",
+									"value": "2025"
+								},
+								{
+									"key": "type",
+									"value": "general"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Monthly Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myrekap",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"month\": 10,\n    \"year\": 2025\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/products/stocks/monthly",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								"stocks",
+								"monthly"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "Get Reviews By Product Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/products/:id/reviews",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id",
+								"reviews"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Review Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rating\": 4,\r\n    \"comment\": \"Mantap\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/products/:id/reviews",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id",
+								"reviews"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Review Product",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products/:id/reviews",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id",
+								"reviews"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CartItems",
+			"item": [
+				{
+					"name": "Get User Cart Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/carts",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add To Cart Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productId\": \"{{product-id-1}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/carts",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Cart Items",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/carts",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cart Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base-url}}/carts/:productId",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"carts",
+								":productId"
+							],
+							"variable": [
+								{
+									"key": "productId",
+									"value": "{{product-id-1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Increment Cart Item",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/carts/:productId/:action",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"carts",
+								":productId",
+								":action"
+							],
+							"variable": [
+								{
+									"key": "productId",
+									"value": "{{product-id-1}}"
+								},
+								{
+									"key": "action",
+									"value": "increment"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Decrement Cart Item",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/carts/:id/:action",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"carts",
+								":id",
+								":action"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{product-id-1}}"
+								},
+								{
+									"key": "action",
+									"value": "decrement"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "MyRekap",
+					"item": [
+						{
+							"name": "Get All Orders",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myrekap",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base-url}}/orders/myrekap",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myrekap"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Order By Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myrekap",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base-url}}/orders/myrekap/:id",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myrekap",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{order-myrekap-id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myrekap",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "customerName",
+											"value": "Sahroni",
+											"type": "text"
+										},
+										{
+											"key": "customerCategory",
+											"value": "umum",
+											"type": "text"
+										},
+										{
+											"key": "phoneNumber",
+											"value": "0888888888",
+											"type": "text"
+										},
+										{
+											"key": "items",
+											"value": "{\"productId\":\"{{product-id-1}}\", \"quantity\":\"2\" , \"message\": null}",
+											"type": "text"
+										},
+										{
+											"key": "readyDate",
+											"value": "2025-07-28",
+											"type": "text"
+										},
+										{
+											"key": "deliveryOption",
+											"value": "self_pickup",
+											"type": "text"
+										},
+										{
+											"key": "deliveryAddress",
+											"value": "ssss",
+											"type": "text"
+										},
+										{
+											"key": "shippingCost",
+											"value": "0",
+											"type": "text"
+										},
+										{
+											"key": "isPaid",
+											"value": "false",
+											"type": "text"
+										},
+										{
+											"key": "paymentMethod",
+											"value": "bank_transfer",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "paymentProof",
+											"type": "file",
+											"src": "postman-cloud:///1f057479-2ce8-4d30-9025-c31e260ec0df",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/orders/myrekap",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myrekap"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Order",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myrekap",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "customerName",
+											"value": "Sahroni",
+											"type": "text"
+										},
+										{
+											"key": "customerCategory",
+											"value": "perbankan",
+											"type": "text"
+										},
+										{
+											"key": "phoneNumber",
+											"value": "0888888888",
+											"type": "text"
+										},
+										{
+											"key": "items",
+											"value": "[{\"productId\":\"{{product-id-1}}\", \"quantity\":\"3\" , \"message\": null}]",
+											"type": "text"
+										},
+										{
+											"key": "readyDate",
+											"value": "2025-07-28",
+											"type": "text"
+										},
+										{
+											"key": "deliveryOption",
+											"value": "self_pickup",
+											"type": "text"
+										},
+										{
+											"key": "deliveryAddress",
+											"value": "ssss",
+											"type": "text"
+										},
+										{
+											"key": "shippingCost",
+											"value": "1000",
+											"type": "text"
+										},
+										{
+											"key": "isPaid",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "paymentMethod",
+											"value": "bank_transfer",
+											"type": "text"
+										},
+										{
+											"key": "paymentProof",
+											"type": "file",
+											"src": "postman-cloud:///1f0ac288-998b-40c0-9a55-f63af641d40e"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/orders/myrekap/:id",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myrekap",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{order-myrekap-id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myrekap",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "status",
+											"value": "delivery",
+											"type": "text"
+										},
+										{
+											"key": "finishedProduct",
+											"type": "file",
+											"src": "postman-cloud:///1f03f88a-5808-41d0-b049-2a5f13f06a15",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/orders/myrekap/:id/status",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myrekap",
+										":id",
+										"status"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{order-myflower-id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "MyFlower",
+					"item": [
+						{
+							"name": "Get User Orders",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myflower",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{base-url}}/orders/myflower",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myflower"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Order By Id",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myflower",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"zhanka\",\r\n    \"password\": \"223344\"\r\n}"
+								},
+								"url": {
+									"raw": "{{base-url}}/orders/myflower/:id",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myflower",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{order-myflower-id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myflower",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"deliveryOption\":\"delivery\",\r\n    \"deliveryAddress\":\"aaaaa\",\r\n    \"readyDate\":\"2025-10-04\",\r\n    \"paymentMethod\": \"cod\",\r\n    \"items\":[\r\n        { \"productId\": \"{{product-id-1}}\", \"message\": \"Selamat Atas Wisuda Untuk Messi\" }\r\n        // { \"productId\": \"{{product-id-2}}\", \"message\": \"Ini Untuk Neymar\" }\r\n    ]\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/orders/myflower",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myflower"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel Order",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myrekap",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base-url}}/orders/myflower/:id/:status",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myflower",
+										":id",
+										":status"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{order-myflower-id}}"
+										},
+										{
+											"key": "status",
+											"value": "cancel"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Confirm Order",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myflower",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base-url}}/orders/myflower/:id/:status",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myflower",
+										":id",
+										":status"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{order-myflower-id}}"
+										},
+										{
+											"key": "status",
+											"value": "confirm"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Order",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-app-name",
+										"value": "myflower",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{base-url}}/orders/myflower/:id",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"orders",
+										"myflower",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "cmhahmfcp0019mswvhwov4nt3"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Post Transaction Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"orderCode\": \"{{order-code-myflower}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/transactions/create",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"transactions",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Transaction Cancel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/transactions/:orderCode/cancel",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"transactions",
+								":orderCode",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "orderCode",
+									"value": "{{order-code-myflower}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Transaction Refund",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": 1000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/transactions/:orderCode/refund",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"transactions",
+								":orderCode",
+								"refund"
+							],
+							"variable": [
+								{
+									"key": "orderCode",
+									"value": "{{order-code-myflower}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Transaction Expired",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-app-name",
+								"value": "myflower",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/transactions/:orderCode/expire",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"transactions",
+								":orderCode",
+								"expire"
+							],
+							"variable": [
+								{
+									"key": "orderCode",
+									"value": "{{order-code-myflower}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base-url",
+			"value": "http://localhost:5000/api/v2"
+		},
+		{
+			"key": "user-id",
+			"value": "cm8k1f1yn0000frd3mlyweians"
+		},
+		{
+			"key": "product-id-1",
+			"value": ""
+		},
+		{
+			"key": "product-id-2",
+			"value": ""
+		},
+		{
+			"key": "order-myrekap-id",
+			"value": ""
+		},
+		{
+			"key": "order-myflower-id",
+			"value": ""
+		},
+		{
+			"key": "order-code-myflower",
+			"value": ""
+		}
+	]
+}

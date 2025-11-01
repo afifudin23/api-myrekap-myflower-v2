@@ -1,0 +1,211 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Enum Role {
+  admin
+  superadmin
+  customer
+}
+
+Enum OtpType {
+  email_verification
+  password_reset
+}
+
+Enum CustomerCategory {
+  umum
+  pemda
+  perbankan
+}
+
+Enum DeliveryOption {
+  self_pickup
+  delivery
+}
+
+Enum PaymentMethod {
+  cash
+  bank_transfer
+}
+
+Enum PaymentStatus {
+  paid
+  unpaid
+}
+
+Enum OrderStatus {
+  in_process
+  delivery
+  completed
+  canceled
+}
+
+Enum OrderImageType {
+  payment_proof
+  finished_product
+}
+
+Enum StockType {
+  stock_in
+  stock_out
+}
+
+Enum Source {
+  myrekap
+  myflower
+}
+
+Table users {
+  id varchar [pk, default: "cuid()"]
+  user_code varchar
+  full_name varchar 
+  username varchar 
+  email varchar 
+  password varchar
+  phone_number varchar
+  customer_category CustomerCategory [null]
+  role Role
+  is_verified bool [default: false]
+  created_at timestamp [default: "now()"]
+  updated_at timestamp
+
+  indexes {
+    user_code [unique]
+    username [unique]
+    email [unique]
+  }
+}
+
+Table user_otp {
+  id varchar [pk, default: "cuid()"]
+  user_id varchar [ref: > users.id]
+  code varchar
+  type OtpType
+  expires_at timestamp
+  created_at timestamp [default: "now()"]
+}
+
+Table products {
+  id varchar [pk, default: "cuid()"]
+  product_code varchar
+  name varchar
+  price int
+  stock int [default: 0]
+  description varchar
+  is_active bool [default: true]
+  created_at timestamp [default: "now()"]
+
+  indexes {
+    product_code [unique]
+    name [unique]
+  }
+}
+
+Table stock_transactions {
+  id varchar [pk, default: "cuid()"]
+  product_id varchar [ref: > products.id]
+  type StockType
+  quantity int
+  note varchar
+  created_at timestamp [default: "now()"]
+}
+
+Table monthly_stock_reports {
+  id varchar [pk, default: "cuid()"]
+  product_id varchar [ref: > products.id]
+  month int
+  year int
+  initial_stock int
+  stock_in int
+  stcok_out int
+  final_stock int
+  created_at timestamp [default: "now()"]
+}
+
+Table product_images {
+  id varchar [pk, default: "cuid()"]
+  file_name varchar
+  size int
+  public_id varchar
+  secure_url varchar
+  product_id varchar [ref: > products.id]
+}
+
+Table cart_items {
+  id varchar [pk, default: "cuid()"]
+  user_id varchar [ref: > users.id]
+  product_id varchar [ref: > products.id]
+  quantity int 
+
+  indexes {
+    (user_id, product_id) [unique]
+  }
+}
+
+Table orders {
+  id varchar [default: "cuid()"]
+  source Source
+  order_code varchar
+  user_id varchar [ref: > users.id]
+
+  // customer
+  customer_name varchar
+  customer_categoory CustomerCategory [default: 'umum']
+  phone_number varchar
+  delivery_option DeliveryOption
+  ready_date timestamp
+
+  // delivery
+  shipping_cost int [default: 0]
+  delivery_address varchar [null]
+
+  // payment
+  total_price int
+  payment_method PaymentMethod
+  payment_provider varchar [null]
+
+  // status
+  payment_status PaymentStatus [default: "unpaid"]
+  order_status OrderStatus [default: "in_process"]
+  order_date timestamp
+
+  indexes {
+    order_code [unique]
+  }
+}
+
+Table order_items {
+  id varchar [pk, default: "cuid()"]
+  order_id varchar [ref: > orders.id]
+  product_id varchar [ref: > products.id]
+  quantity int
+  message varchar [null]
+  unit_price int
+  total_price int
+}
+
+Table order_images {
+  id varchar [pk, default: "cuid()"]
+  order_id varchar [ref: > orders.id]
+  type OrderImageType
+  file_name varchar
+  size int
+  public_id varchar
+  secureUrl varchar
+
+  indexes {
+    (order_id, type) [unique]
+  }
+}
+
+Table reviews {
+  id varchar [pk, default: "cuid()"]
+  rating int
+  comment varchar
+  user_id varchar [ref: > users.id]
+  product_id varchar [ref: > products.id]
+
+  indexes {
+    (user_id, product_id) [unique]
+  }
+}

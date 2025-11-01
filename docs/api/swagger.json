@@ -526,8 +526,40 @@
               "application/json": {
                 "schema": {
                   "oneOf": [
-                    { "$ref": "#/components/schemas/VerifyOTPEmailVerificationResponse" },
-                    { "$ref": "#/components/schemas/VerifyOTPPasswordResetResponse" }
+                    {
+                      "type": "object",
+                      "description": "Response for successful email verification.",
+                      "properties": {
+                        "message": { "type": "string" },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "email": { "type": "string" },
+                            "type": { "type": "string", "enum": ["EMAIL_VERIFICATION"] },
+                            "fullName": { "type": "string" },
+                            "role": { "type": "string", "enum": ["SUPERADMIN", "ADMIN", "CUSTOMER"] }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "description": "Response for successful password reset verification. The 'resetToken' field in the response should be used as the Bearer token for 'BearerResetToken' authentication.",
+                      "properties": {
+                        "message": { "type": "string" },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "email": { "type": "string" },
+                            "type": { "type": "string", "enum": ["PASSWORD_RESET"] },
+                            "resetToken": {
+                              "type": "string",
+                              "description": "JWT used for password reset authentication (BearerResetToken)."
+                            }
+                          }
+                        }
+                      }
+                    }
                   ]
                 },
                 "examples": {
@@ -535,12 +567,10 @@
                     "value": {
                       "message": "Verify user otp successfully",
                       "data": {
-                        "success": true,
+                        "email": "johndoe@mail.com",
                         "type": "EMAIL_VERIFICATION",
-                        "data": {
-                          "fullName": "John Doe",
-                          "role": "SUPERADMIN"
-                        }
+                        "fullName": "John Doe",
+                        "role": "SUPERADMIN"
                       }
                     }
                   },
@@ -548,7 +578,7 @@
                     "value": {
                       "message": "Verify user otp successfully",
                       "data": {
-                        "success": true,
+                        "email": "johndoe@mail.com",
                         "type": "PASSWORD_RESET",
                         "resetToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWdrampmem4wMDAwamJ4YTE2ZXFsc3JlIiwiaWF0IjoxNjg4NzI1MTI0LCJleHAiOjE2ODg3MjYwMjR9.dV8Hk7mQ1pXnXGmYc1bXq8jv0nV7y5v3hX9Zz5Zz5Y"
                       }
@@ -975,9 +1005,9 @@
                     {
                       "id": "cmh6ep6070009xqobb2tennjp",
                       "userCode": "USR-E2MH6EP607-B73614",
-                      "fullName": "Udin",
-                      "username": "udin",
-                      "email": "afifu5881@gmail.com",
+                      "fullName": "John Doe",
+                      "username": "johndoe",
+                      "email": "johndoe@mailcom",
                       "phoneNumber": "908239823",
                       "customerCategory": "PERBANKAN",
                       "role": "CUSTOMER",
@@ -1076,7 +1106,7 @@
                       "userCode": "USR-5AMH3G62B8-7B8E18",
                       "fullName": "John Doe",
                       "username": "admin",
-                      "email": "afifu5882@gmail.com",
+                      "email": "johndoe@mail.com",
                       "phoneNumber": "08975836972",
                       "customerCategory": null,
                       "role": "SUPERADMIN",
@@ -2343,7 +2373,7 @@
                       "userId": "cmh6ep6070009xqobb2tennjp",
                       "productId": "cmh3nqrdt0000xq0xaqebjqaq",
                       "user": {
-                        "fullName": "Udin"
+                        "fullName": "John Doe"
                       }
                     }
                   ]
@@ -4667,45 +4697,6 @@
             "type": "array",
             "nullable": true,
             "items": {}
-          }
-        }
-      },
-      "VerifyOTPEmailVerificationResponse": {
-        "type": "object",
-        "description": "Response for successful email verification.",
-        "properties": {
-          "message": { "type": "string" },
-          "data": {
-            "type": "object",
-            "properties": {
-              "success": { "type": "boolean" },
-              "type": { "type": "string", "enum": ["EMAIL_VERIFICATION"] },
-              "data": {
-                "type": "object",
-                "properties": {
-                  "fullName": { "type": "string" },
-                  "role": { "type": "string", "enum": ["SUPERADMIN", "ADMIN", "CUSTOMER"] }
-                }
-              }
-            }
-          }
-        }
-      },
-      "VerifyOTPPasswordResetResponse": {
-        "type": "object",
-        "description": "Response for successful password reset verification. The 'resetToken' field in the response should be used as the Bearer token for 'BearerResetToken' authentication.",
-        "properties": {
-          "message": { "type": "string" },
-          "data": {
-            "type": "object",
-            "properties": {
-              "success": { "type": "boolean" },
-              "type": { "type": "string", "enum": ["PASSWORD_RESET"] },
-              "resetToken": {
-                "type": "string",
-                "description": "JWT used for password reset authentication (BearerResetToken)."
-              }
-            }
           }
         }
       },
