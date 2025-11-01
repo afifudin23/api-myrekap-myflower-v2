@@ -6,8 +6,12 @@ import { cartItemSchema } from "@/schemas";
 export const findAll = async (userId: string) => {
     return await prisma.cartItem.findMany({
         where: { userId },
-        include: {
-            product: { include: { images: { take: 1 } } },
+        select: {
+            id: true,
+            quantity: true,
+            product: {
+                select: { id: true, name: true, price: true, images: { take: 1, select: { secureUrl: true } } },
+            },
         },
     });
 };
@@ -22,6 +26,7 @@ export const upsertItem = async (userId: string, data: cartItemSchema.AddToCartT
         where: { userId_productId: { userId, productId: data.productId } },
         update: { quantity: { increment: 1 } },
         create: { productId: data.productId, userId, quantity: 1 },
+        select: { id: true, quantity: true },
     });
     return { data: result, isNew: result.quantity === 1 };
 };
@@ -31,7 +36,7 @@ export const updateQuantity = async (userId: string, productId: string, action: 
         const item = await prisma.cartItem.findUniqueOrThrow({ where: { userId_productId: { userId, productId } } });
         if (item.quantity === 1 && action === "decrement") {
             return {
-                data: await prisma.cartItem.delete({ where: { id: item.id } }),
+                data: await prisma.cartItem.delete({ where: { id: item.id }, select: { id: true } }),
                 updated: false,
             };
         }
@@ -39,17 +44,22 @@ export const updateQuantity = async (userId: string, productId: string, action: 
             data: await prisma.cartItem.update({
                 where: { id: item.id },
                 data: action === "increment" ? { quantity: { increment: 1 } } : { quantity: { decrement: 1 } },
+                select: { id: true },
             }),
             updated: true,
+            
         };
     } catch (_error) {
-        throw new NotFoundException("Product not found", ErrorCode.CART_ITEM_NOT_FOUND);
+        throw new NotFoundException("Cart item not found", ErrorCode.CART_ITEM_NOT_FOUND);
     }
 };
 
 export const removeItem = async (userId: string, productId: string) => {
     try {
-        return await prisma.cartItem.delete({ where: { userId_productId: { userId, productId } } });
+        return await prisma.cartItem.delete({
+            where: { userId_productId: { userId, productId } },
+            select: { id: true },
+        });
     } catch (_error) {
         throw new NotFoundException("Cart item not found", ErrorCode.CART_ITEM_NOT_FOUND);
     }

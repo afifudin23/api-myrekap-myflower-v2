@@ -5,9 +5,8 @@ import { Request, Response, NextFunction } from "express";
 
 export const getReviewsByProductId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const productId = req.params.productId;
-        const data = await reviewService.findAll(productId);
-        res.json({ message: data.length > 0 ? "Reviews retrieved successfully" : "No reviews available", data });
+        const data = await reviewService.findAll(req.params.id);
+        res.json({ message: data.length > 0 ? "Product reviews retrieved successfully" : "No product reviews available", data });
     } catch (error) {
         next(error);
     }
@@ -15,10 +14,9 @@ export const getReviewsByProductId = async (req: Request, res: Response, next: N
 export const createReview = async (req: Request, res: Response, next: NextFunction) => {
     const body = reviewSchema.create.parse(req.body);
     try {
-        const productId = req.params.productId;
         const userId = (req as AuthReq).user.id;
-        const { data, isNew } = await reviewService.create(productId, userId, body);
-        res.json({ message: isNew ? "Review created successfully" : "Review updated successfully", data });
+        const { data, isNew } = await reviewService.create(req.params.id, userId, body);
+        res.json({ message: isNew ? "Product review created successfully" : "Product review updated successfully", data });
     } catch (error) {
         next(error);
     }
@@ -26,10 +24,9 @@ export const createReview = async (req: Request, res: Response, next: NextFuncti
 
 export const deleteReview = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const productId = req.params.productId;
         const userId = (req as AuthReq).user.id;
-        const data = await reviewService.remove(userId, productId);
-        res.json({ message: "Review deleted successfully", data });
+        const data = await reviewService.remove(userId, req.params.id);
+        res.json({ message: "Product review deleted successfully", data });
     } catch (error) {
         next(error);
     }

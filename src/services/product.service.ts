@@ -160,15 +160,21 @@ export const manageStock = async (id: string, userId: string, body: productSchem
     body.note =
         (body.note && body.note.trim()) ||
         (body.type === "STOCK_IN" ? `Stock in by admin #${user?.userCode}` : `Stock out by admin #${user?.userCode}`);
-    await prisma.product.update({
-        where: { id },
-        data: { stock: body.type === "STOCK_IN" ? { increment: body.quantity } : { decrement: body.quantity } },
-    });
-    const transaction = await prisma.stockTransaction.create({
-        data: { productId: id, type: body.type, quantity: body.quantity, note: body.note },
-    });
-
-    return transaction;
+    try {
+        await prisma.product.update({
+            where: { id },
+            data: { stock: body.type === "STOCK_IN" ? { increment: body.quantity } : { decrement: body.quantity } },
+        });
+        const transaction = await prisma.stockTransaction.create({
+            data: { productId: id, type: body.type, quantity: body.quantity, note: body.note }, 
+            select:{ id: true },
+        });
+    
+        return { id: transaction.id, isUpdated: true };
+        
+    } catch (error) {
+        throw new InternalException("Failed to manage stock", ErrorCode.INTERNAL_EXCEPTION, error);
+    }
 };
 
 export const getReport = async (month: number, year: number, type: "STOCK_IN" | "STOCK_OUT") => {

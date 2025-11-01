@@ -40,7 +40,14 @@ export const updateQuantity = async (req: Request, res: Response, next: NextFunc
             );
         }
         const { data, updated } = await cartItemService.updateQuantity(userId, req.params.productId, action);
-        res.json({ message: updated ? "Cart item decremented successfully" : "Cart item deleted successfully", data });
+        res.json({
+            message: updated
+                ? action === "increment"
+                    ? "Cart item incremented successfully"
+                    : "Cart item decremented successfully"
+                : "Cart item deleted successfully",
+            data,
+        });
     } catch (error) {
         return next(error);
     }

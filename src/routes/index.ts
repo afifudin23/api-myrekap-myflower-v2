@@ -15,7 +15,7 @@ const rootRouter: Router = Router();
 rootRouter.use("/auth", authRouter);
 rootRouter.use("/users", userRouter);
 rootRouter.use("/products", productRouter);
-rootRouter.use("/products/:productId/reviews", reviewRouter);
+rootRouter.use("/products/:id/reviews", reviewRouter);
 rootRouter.use("/carts", cartItemRouter);
 rootRouter.use("/orders/myrekap", ordersMyRekapRouter);
 rootRouter.use("/orders/myflower", ordersMyFlowerRouter);

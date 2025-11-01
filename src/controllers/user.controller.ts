@@ -17,7 +17,7 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
     const userId = (req as AuthReq).user.id;
     try {
         const data = await userService.getMe(userId);
-        res.status(200).json({ message: "User retrieved successfully", data });
+        res.status(200).json({ message: "User current retrieved successfully", data });
     } catch (error) {
         return next(error);
     }

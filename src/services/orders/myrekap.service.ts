@@ -40,10 +40,10 @@ export const findAll = async (query: any) => {
     const data = await prisma.order.findMany({
         where: {
             orderDate: orderDateFilter,
-            customerCategory: customer_category !== "ALL" ? customer_category?.toUpperCase() : undefined,
-            paymentMethod: payment_method !== "ALL" ? payment_method?.toUpperCase() : undefined,
-            paymentStatus: payment_status !== "ALL" ? payment_status?.toUpperCase() : undefined,
-            orderStatus: order_status !== "ALL" ? order_status?.toUpperCase() : undefined,
+            customerCategory: customer_category?.toUpperCase() !== "ALL" ? customer_category?.toUpperCase() : undefined,
+            paymentMethod: payment_method?.toUpperCase() !== "ALL" ? payment_method?.toUpperCase() : undefined,
+            paymentStatus: payment_status?.toUpperCase() !== "ALL" ? payment_status?.toUpperCase() : undefined,
+            orderStatus: order_status?.toUpperCase() !== "ALL" ? order_status?.toUpperCase() : undefined,
         },
         orderBy: {
             orderDate: orderDateOrderBy,
