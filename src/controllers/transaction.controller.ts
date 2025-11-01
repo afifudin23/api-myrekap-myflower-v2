@@ -12,7 +12,7 @@ export const handlePaymentNotification = async (req: Request, res: Response, nex
     }
 };
 export const createTransaction = async (req: Request, res: Response, next: NextFunction) => {
-    const { orderCode } = transactionSchema.createTransactionSchema.parse(req.body);
+    const { orderCode } = transactionSchema.create.parse(req.body);
     try {
         const user = (req as AuthReq).user;
         const data = await transactionService.create(user, orderCode);
@@ -40,9 +40,9 @@ export const expireTransaction = async (req: Request, res: Response, next: NextF
     }
 };
 export const refundTransaction = async (req: Request, res: Response, next: NextFunction) => {
+    const { amount } = transactionSchema.refund.parse(req.body);
     try {
         const { orderCode } = req.params;
-        const { amount } = req.body;
         const data = await transactionService.refund(orderCode, amount);
         res.status(200).json({ message: "Transaction refunded successfully", data });
     } catch (error) {

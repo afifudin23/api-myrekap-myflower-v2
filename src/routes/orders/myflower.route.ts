@@ -26,7 +26,7 @@ ordersMyFlowerRouter.patch(
     errorHandler(ordersMyFlowerController.updateOrderStatus)
 );
 ordersMyFlowerRouter.delete(
-    "/:orderCode",
+    "/:id",
     [authMiddleware, requireMyFlowerApp],
     errorHandler(ordersMyFlowerController.deleteOrder)
 );

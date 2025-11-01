@@ -158,9 +158,9 @@ export const updateStatus = async (id: string, status: "cancel" | "confirm") => 
     }
 };
 
-export const remove = async (orderCode: string) => {
+export const remove = async (id: string) => {
     try {
-        return await prisma.order.delete({ where: { orderCode }, select: { id: true } });
+        return await prisma.order.delete({ where: { id }, select: { id: true } });
     } catch (_error) {
         throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
     }
