@@ -1,13 +1,13 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "MyRekap API Documentation",
-    "description": "MyRekap API provides endpoints to manage users, products, orders, and other operations. All endpoints require authentication via JWT. There are two roles: `superadmin` with full access and `admin` with limited access. This documentation covers all available routes, request parameters, response formats, and authentication requirements.",
-    "version": "1.0.0"
+    "title": "API MyRekap & MyFlower v2",
+    "description": "Backend API powering MyRekap (admin dashboard) and MyFlower (online store). It manages users, products, orders, payments, and reports with role-based access: `superadmin`, `admin`, and `customer`. All endpoints require JWT authentication.",
+    "version": "2.0.0"
   },
   "servers": [
     {
-      "url": "http://localhost:{port}/api/v1",
+      "url": "http://localhost:{port}/api/v2",
       "description": "Local server",
       "variables": {
         "port": {
@@ -208,7 +208,7 @@
     "/auth/register": {
       "post": {
         "tags": ["Authentication (MyFlower)"],
-        "summary": "Register New Customer (MyFlower Only)",
+        "summary": "Register New Customer",
         "parameters": [
           {
             "$ref": "#/components/parameters/app-name-myflower"
