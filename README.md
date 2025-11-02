@@ -27,7 +27,7 @@ This API powers two connected applications — **MyRekap** (for reporting and ma
 -   [Tech Stack Required](#tech-stack-required)
 -   [Getting Started](#getting-started)
     -   [Initial Step](#1-initial-step)
-    -   [Setup](#2-setup-backend-api)
+    -   [Setup API](#2-setup-api)
 -   [Documentation](#documentation)
     -   [API Documentation](#api-documentation)
     -   [ERD Database](#erd-database)
@@ -36,25 +36,27 @@ This API powers two connected applications — **MyRekap** (for reporting and ma
 
 ## Features
 
-### 🌸 MyFlower
-
-The MyFlower service focuses on sales management for a flower shop, allowing users to:
-
--   Manage products (create, update, delete, and display)
--   Handle stock and inventory reports automatically
--   Process customer orders and payments through Midtrans
--   Send real-time email notifications for order updates
--   Generate receipts and manage order histories
-
 ### 📊 MyRekap
 
 The MyRekap service serves as the reporting and administrative dashboard, enabling managers and admins to:
 
--   View and analyze sales performance from MyFlower
--   Track monthly stock movement (initial, in, out, and final)
--   Generate recap reports and export summaries
--   Receive automated notifications for order updates
--   Manage user accounts, roles, and system activity
+-   Product Management – Create, update, and delete products
+-   Order Management – View and update order statuses (especially orders placed from MyFlower)
+-   Report Generation – Automatically generate monthly stock and sales reports
+-   User Management – Manage admin, staff, and user accounts
+-   Notifications – Automatically send notifications to the manager and customer when a new order is created or an order is updated.
+
+### 🌸 MyFlower
+
+The MyFlower service focuses on sales management for a flower shop, allowing users to:
+
+-   Online Ordering – Browse and order flowers easily
+-   Shopping Cart – Add and manage items before checkout
+-   Payment Integration – Secure payments handled via Midtrans Snap
+-   Order History & Receipt – View past orders and print digital receipts
+-   Product Reviews – Submit product feedback and ratings
+-   Order Tracking – Monitor order progress and delivery status
+-   Notifications – Automatically send order status updates to the customer and manager when orders are created or updated
 
 ---
 
