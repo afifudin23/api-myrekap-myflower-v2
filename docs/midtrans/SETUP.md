@@ -76,7 +76,7 @@ https://{your-domain-myflower}/orders/payment-success
 https://{your-domain-myflower}/orders/payment-failed
 ```
 
-<a href="https://dashboard.sandbox.midtrans.com/settings/payment/notification" align="center"> <img src="https://raw.githubusercontent.com/afifudin23/api-myrekap-myflower-v2/main/docs/midtrans/snap-preferences.jpg" alt="Access Key"/> </a>
+<a href="https://dashboard.sandbox.midtrans.com/settings/snap_preference" align="center"> <img src="https://raw.githubusercontent.com/afifudin23/api-myrekap-myflower-v2/main/docs/midtrans/snap-preferences.jpg" alt="Access Key"/> </a>
 
 > ⚠️ If your MyFlower frontend has not been deployed yet, you can also use [**ngrok**](https://ngrok.com) to expose your local React app for testing Snap redirections.  
 > Once deployed, replace the ngrok URL with your production domain.
