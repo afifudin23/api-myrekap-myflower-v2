@@ -207,11 +207,11 @@
     },
     "/auth/register": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": ["Authentication (MyFlower)"],
         "summary": "Register New Customer (MyFlower Only)",
         "parameters": [
           {
-            "$ref": "#/components/parameters/x-app-name"
+            "$ref": "#/components/parameters/app-name-myflower"
           }
         ],
         "requestBody": {
