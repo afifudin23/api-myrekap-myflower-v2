@@ -17,7 +17,7 @@
 </p>
 
 **API MyRekap & MyFlower v2** is a dual-service system built with **Node.js** and **TypeScript**, designed to support data management and business operations efficiently.
-This API powers two connected applications — [**MyRekap**](https://github.com/afifudin23/myrekap-v2) (for reporting and management) and [**MyFlower**](https://github.com/afifudin23/myrekap-v2) (for product sales and transactions) — enabling seamless communication and real-time updates between both services.
+This API powers two connected applications — [**MyRekap**](https://github.com/afifudin23/myrekap-v2) (for reporting and management) and [**MyFlower**](https://github.com/afifudin23/myflower-v2) (for product sales and transactions) — enabling seamless communication and real-time updates between both services.
 
 ---
 
