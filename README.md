@@ -6,13 +6,14 @@
 <h1 align="center">API MyRekap & MyFlower v2</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Node.js-v22.18.0-43853d?logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-v22.18.0-tosca?logo=node.js&logoColor=white" />
   <img src="https://img.shields.io/badge/Express.js-4.21.2-000000?logo=express&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-v5.6.3-3178C6?logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/Prisma-v6.3.1-2D3748?logo=prisma&logoColor=white" />
   <img src="https://img.shields.io/badge/MariaDB-v10.11.6-003545?logo=mariadb&logoColor=white" />
-  <img src="https://img.shields.io/badge/Midtrans-Payment%20Gateway-0A9E01" />
-  <img src="https://img.shields.io/badge/Brevo-Email%20Service-0D99FF" />
+  <img src="https://img.shields.io/badge/Cloudinary-Image%20Storage-030434?logo=cloudinary&logoColor=white" />
+  <img src="https://img.shields.io/badge/Midtrans-Payment%20Gateway-0D99FF?logo=midtrans&logoColor=white" />
+  <img src="https://img.shields.io/badge/Brevo-Email%20Service-98ff98?logo=brevo&logoColor=white" />
   <img src="https://img.shields.io/badge/License-MIT-yellow" />
 </p>
 
@@ -78,6 +79,7 @@ The MyFlower service focuses on sales management for a flower shop, allowing use
 -   **Third-Party Service:**
     -   Brevo (for email service)
     -   Midtrans (for payment gateway)
+    -   Cloudinary (for image storage and management)
 
 ---
 
