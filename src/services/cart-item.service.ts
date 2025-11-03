@@ -9,6 +9,7 @@ export const findAll = async (userId: string) => {
         select: {
             id: true,
             quantity: true,
+            productId: true,
             product: {
                 select: { id: true, name: true, price: true, images: { take: 1, select: { secureUrl: true } } },
             },

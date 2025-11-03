@@ -68,7 +68,7 @@ model Product {
   name        String   @unique @map("name")
   price       Int      @map("price")
   stock       Int      @default(0) @map("stock")
-  description String   @map("description")
+  description String   @db.Text @map("description")
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
 
