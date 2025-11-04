@@ -102,8 +102,8 @@ export const verifyUserOtp = async (req: Request, res: Response, next: NextFunct
         if (type === "EMAIL_VERIFICATION") {
             res.cookie(`token_${appName}`, data?.accessToken, {
                 httpOnly: true,
-                secure: false,
-                sameSite: "strict",
+                secure: true,
+                sameSite: "none",
                 maxAge: 60 * 60 * 24 * 1000,
                 path: "/",
             });
