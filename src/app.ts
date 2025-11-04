@@ -12,7 +12,7 @@ const app = express();
 
 // middlewares
 app.use(helmet()); // for security
-const allowedOrigins = [env.MYREKAP_URL, env.MYFLOWER_URL];
+const allowedOrigins = ["https://afifudin23.github.io", env.MYREKAP_URL, env.MYFLOWER_URL];
 app.use(
     cors({
         origin: (origin, callback) => {
