@@ -18,10 +18,15 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         const data = await authService.login(body, appName);
         if (data.needVerification)
             return res.status(200).json({ message: "Account not verified. OTP has been sent to your email.", data });
+        // sameSite:
+        // - "none"   = allow cross-site cookies (for different domains, must use secure: true)
+        // - "lax"    = send cookies only on top-level navigation (default, safer, limited cross-site)
+        // - "strict" = send cookies only from the same domain (most secure, no cross-site)
+
         res.cookie(`token_${appName}`, data.token, {
             httpOnly: true, // Tidak dapat diakses oleh JavaScript
-            secure: false, // True = Hanya dikirim melalui HTTPS (penting untuk production)
-            sameSite: "strict", // Tidak terkirim di request pihak ketiga
+            secure: true, // true = Hanya dikirim melalui HTTPS (penting untuk production)
+            sameSite: "none", 
             maxAge: 60 * 60 * 24 * 1000,
             path: "/", // Hanya untuk path ini
         });
